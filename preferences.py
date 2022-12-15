@@ -1,34 +1,24 @@
+from os.path import basename, realpath
+
 import bpy
 from bpy.types import AddonPreferences
 
-from functools import cache
+G_ADDON_NAME = basename(realpath(__file__))
 
 
 class Preferences:
-    import preferences
-    addon = preferences.AddonProperty
-
     @staticmethod
-    def _static_pref(string=False) -> 'addon':
-        """
-        ·´»Ø²å¼şÊôĞÔ²¢»º´æ
-        Ã¿Ò»´Î¿ª¹Ø²å¼ş¶¼ĞèÒªÇå³ı»º´æ
-        ¾²Ì¬·½·¨
-        """
-
-    @cache
-    def _pref() -> 'addon':
-        """»º´æÆ«ºÃÉèÖÃ"""
-        return Preferences._static_pref()
+    def _pref() -> 'AddonPreferences':
+        return bpy.context.preferences.addons[AddonProperty.bl_idname].preferences
 
     @property
-    def pref(self) -> 'addon':
-        """·´»Ø²å¼şÊôĞÔ"""
+    def pref(self) -> 'AddonPreferences':
+        """åå›æ’ä»¶å±æ€§"""
         return Preferences._pref()
 
 
 class AddonProperty(Preferences, AddonPreferences):
-    bl_idname = name
+    bl_idname = G_ADDON_NAME
 
     def draw(self, context):
         ...

@@ -1,32 +1,30 @@
-from os.path import join, dirname
 
-import bpy.utils
-
-from . import ops, preferences, panel
+from . import icons, ops, panel, preferences
 
 bl_info = {
-    "name": "Align Object",
-    "description": "对齐物体",
+    "name": "POPOTI对齐助手",
+    "description": "更友好的基于观察视角的对齐",
     "author": "AIGODLIKE Community(BlenderCN辣椒,小萌新)",
     "version": (1, 0),
-    "blender": (3, 4, 0),
+    "blender": (3, 0, 0),
     "location": "Tool Panel",
     "support": "COMMUNITY",
-    "category": "Add Mesh",
+    # "category": "3D View",
 }
-name = bl_info['name']
 
 mod_tuple = (
     ops,
+    icons,
     panel,
     preferences,
 )
-register_module, unregister_module = bpy.utils.register_submodule_factory(mod_tuple)
 
 
 def register():
-    register_module()
+    for mod in mod_tuple:
+        mod.register()
 
 
 def unregister():
-    unregister_module()
+    for mod in mod_tuple:
+        mod.unregister()

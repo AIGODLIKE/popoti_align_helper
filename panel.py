@@ -1,56 +1,138 @@
-import os
-import enum
 import bpy
-from functools import cache
-from os.path import join, dirname
-from bpy.props import BoolProperty
+from bpy.types import Panel
 
-previews_icons = bpy.utils.previews.new()  # 用于存所有的缩略图
+from .icons import get_icon
+from .utils import screen_relevant_direction_3d_axis
+
+align_operator = 'object.tool_kits_fast_align'
 
 
-class ICON:
-    icons = {}
-    thumbnail_suffix = ['.png', '.jpg']  # 缩略图后缀列表
+# one
+def set_axis(layout, axis, icon, center=False):
+    op = layout.operator(
+        align_operator,
+        icon_value=get_icon(icon),
+        text='',
+    )
+    op.mode = 'ALIGN'
 
-    def load_icon(self, icon_path) -> 'bpy.types.ImagePreview':
-        if icon_path and (icon_path not in previews_icons):
-            icon = previews_icons.load(
-                icon_path,
-                icon_path,
-                'IMAGE',
-            )
-            self.icons[icon_path] = icon
-            return icon
+    if axis == 'CENTER':
+        center = True
+        axis = ('X', 'Y', 'Z')
+    for i in axis:
+        value = 'MIN' if len(i) >= 2 else 'MAX'
+        if center:
+            value = 'CENTER'
+        setattr(op, i[-1].lower() + '_align_func', value)
 
-    @staticmethod
-    def clear_icon():
-        global previews_icons
+    op.align_location_axis = {i[-1] for i in axis}
 
-        if previews_icons:
-            bpy.utils.previews.remove(previews_icons)
-            ICON.icons.clear()
-            previews_icons = None
 
-    @staticmethod
-    def new_icon():
-        global previews_icons
+class ObjectAlignPanel(Panel):
+    bl_idname = 'ALIGN_PT_Panel'
+    bl_label = 'POPOTI对齐助手'
 
-        if not previews_icons:
-            previews_icons = bpy.utils.previews.new()
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = "Tool"
+    bl_options = {'DEFAULT_CLOSED'}
 
-    @staticmethod
-    def _get_none_icon():
-        global previews_icons
-        if 'NONE' not in previews_icons:
-            none_path = join(dirname(dirname(__file__)),
-                             'rsc/icons/asset_none.png')
-            previews_icons.load('NONE', none_path, 'IMAGE')
+    def draw(self, context):
+        layout = self.layout
+        layout.operator(align_operator)
+        (x, x_), (y, y_) = screen_relevant_direction_3d_axis(context)
 
-    @staticmethod
-    def preload_icons():
-        '''预加载图标
-        在启动blender或是启用插件时加载图标
-        '''
-        ICON._get_none_icon()
-        for item in PREF._all_asset_items():
-            item.load_icon(item.icon_path)
+        sp = layout.split(align=True)
+        axis = ('X', 'Y', 'Z')
+
+        col = sp.column(align=True)
+        col.alert = True
+        row = col.row(align=True)
+        set_axis(row, {x_, y}, 'Align_Left_Up')
+        set_axis(row, {y}, 'Align_Up')
+        set_axis(row, {x, y}, 'Align_Right_Up')
+        row = col.row(align=True)
+        set_axis(row, {x_}, 'Align_Left')
+        set_axis(row, 'CENTER', 'Align_Center')
+        set_axis(row, {x}, 'Align_Right')
+        row = col.row(align=True)
+        set_axis(row, {x_, y_}, 'Align_Left_Down')
+        set_axis(row, {y_}, 'Align_Down')
+        set_axis(row, {x, y_}, 'Align_Right_Down')
+
+        # two
+        col = sp.column(align=True)
+
+        col.scale_y = 1.5
+
+        def get_center_align(icon):
+            op = col.operator(align_operator,
+                              icon_value=get_icon(icon),
+                              text='',
+                              )
+            op.mode = 'ALIGN'
+            op.align_location = True
+            for i in axis:
+                setattr(op, i.lower() + '_align_func', 'CENTER')
+            return op
+
+        get_center_align('Align_Center_X').align_location_axis = {y[-1]}
+        get_center_align('Align_Center_Y').align_location_axis = {x[-1]}
+
+        # three 分布 地面
+        col = sp.column(align=True)
+        op = col.operator(align_operator,
+                          text='Distribution',
+                          icon_value=get_icon('Align_Distribution_X'))
+        op.mode = 'DISTRIBUTION'
+        op.distribution_sorted_axis = str(axis.index(x[-1]))
+        op.align_location_axis = {x[-1]}
+        op.align_location = True
+
+        op = col.operator(align_operator,
+                          text='Distribution',
+                          icon_value=get_icon('Align_Distribution_Y'))
+        op.mode = 'DISTRIBUTION'
+        op.distribution_sorted_axis = str(axis.index(y[-1]))
+        op.align_location_axis = {y[-1]}
+        op.align_location = True
+
+        op = col.operator(align_operator,
+                          text='Ground',
+                          icon='IMPORT')
+        op.mode = 'GROUND'
+        op.ground_mode = 'MINIMUM'
+        op.align_location_axis = {'Z'}
+        op.align_location = True
+
+        # original cursor active original
+        col = sp.column(align=True)
+        op = col.operator(align_operator,
+                          text='original',
+                          icon='OBJECT_ORIGIN')
+        op.mode = 'ORIGINAL'
+        op = col.operator(align_operator,
+                          text='Active',
+                          icon='RESTRICT_SELECT_OFF')
+
+        op.mode = 'ACTIVE'
+        op = col.operator(align_operator,
+                          text='Cursor',
+                          icon='PIVOT_CURSOR')
+        op.mode = 'CURSOR'
+
+
+class_tuples = (
+    ObjectAlignPanel,
+)
+
+register_class, unregister_class = bpy.utils.register_classes_factory(
+    class_tuples)
+
+
+def register():
+    register_class()
+
+
+def unregister():
+    unregister_class()
