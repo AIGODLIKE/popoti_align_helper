@@ -1,1 +1,3 @@
-# popoti_align_object-
+# Align Object
+
+对齐插件
