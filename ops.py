@@ -232,6 +232,61 @@ class AlignObject(Operator, AlignUi, AlignOps, AlignProperty):
     bl_label = '物体对齐'
     bl_options = {'REGISTER', 'UNDO'}
 
+    def get_event_key(self, event) -> tuple[bool]:
+        """
+        反回event按键(ctrl alt shift)组合的布尔值
+
+        not_key
+        only_ctrl
+        only_alt
+        only_shift
+        shift_alt
+        ctrl_alt
+        ctrl_shift
+        ctrl_shift_alt
+        """
+
+        alt = event.alt
+        shift = event.shift
+        ctrl = event.ctrl
+
+        not_key = ((not ctrl) and (not alt) and (not shift))
+
+        only_ctrl = (ctrl and (not alt) and (not shift))
+        only_alt = ((not ctrl) and alt and (not shift))
+        only_shift = ((not ctrl) and (not alt) and shift)
+
+        shift_alt = ((not ctrl) and alt and shift)
+        ctrl_alt = (ctrl and alt and (not shift))
+
+        ctrl_shift = (ctrl and (not alt) and shift)
+        ctrl_shift_alt = (ctrl and alt and shift)
+        return not_key, only_ctrl, only_alt, only_shift, shift_alt, ctrl_alt, ctrl_shift, ctrl_shift_alt
+
+    def set_event_key(self, event: bpy.types.Event) -> None:
+        """self设置快捷键
+        向self注注event的组合布尔值
+        self.not_key  没有按下其它三个键
+        """
+        (not_key,
+         only_ctrl,
+         only_alt,
+         only_shift,
+         shift_alt,
+         ctrl_alt,
+         ctrl_shift,
+         ctrl_shift_alt) = self.get_event_key(event)
+
+        self.not_key = not_key
+        self.only_ctrl = only_ctrl
+        self.only_alt = only_alt
+        self.only_shift = only_shift
+        self.shift_alt = shift_alt
+        self.ctrl_alt = ctrl_alt
+        self.ctrl_shift = ctrl_shift
+        self.ctrl_shift_alt = ctrl_shift_alt
+        self.ctrl_or_shift_or_alt = event.ctrl or event.alt or event.shift
+
     def get_object_data(self, context):
         # 无法使用物体作为key 因为操作符有undo操作
         objs = context.selected_objects.copy()
