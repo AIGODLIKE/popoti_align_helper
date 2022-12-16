@@ -21,7 +21,57 @@ align_func = (
     ('MAX', '最大点', '对齐到最大点'),)
 
 
-class AlignUi:
+class OperatorProperty:
+    """
+    distribution_func: EnumProperty(
+        name='分布方式',
+        description='分布物体方式',
+        items=(
+            ('spacing',     '间隔',     '统一每个物体间隔'),
+            *align_func,),
+    )"""
+
+    mode_items = (
+        ('ORIGINAL', '世界原点', '对齐到世界原点,和重置功能相同'),
+        ('ACTIVE', '活动项', '对齐到活动物体'),
+        ('CURSOR', '游标', '对齐到游标(缩放将重置为1)'),
+        ('GROUND', '地面', '对齐到地面'),
+        ('DISTRIBUTION', '分布', '分布对齐'),
+        ('ALIGN', '对齐', '常规对齐,可以设置每个轴的对齐方式(最大,居中,最小)'),
+    )
+    mode: EnumProperty(items=mode_items)
+
+    align_location: BoolProperty(name='位置', default=True)
+    align_rotation: BoolProperty(name='旋转', default=True)
+    align_scale: BoolProperty(name='缩放', default=False)
+    align_location_axis: axis_enum_property
+    align_rotation_euler_axis: axis_enum_property
+    align_scale_axis: axis_enum_property
+
+    distribution_sorted_axis: EnumProperty(
+        name='分布排序轴',
+        description='按选择轴对所选物体进行对齐并排序,以获取正确的移动位置',
+        items=(('0', 'X', '按X轴排序1分布'),
+               ('1', 'Y', '按Y轴排序1分布'),
+               ('2', 'Z', '按Z轴排序1分布'),), )
+
+    ground_mode: EnumProperty(
+        items=(('ALL', '所有物体', ''),
+               ('MINIMUM', '最低物体', ''),))
+
+    # 每个一个轴的对齐方式
+    x_align_func: EnumProperty(name='X', items=align_func, default='CENTER', )
+    y_align_func: EnumProperty(name='Y', items=align_func, default='CENTER', )
+    z_align_func: EnumProperty(name='Z', items=align_func, default='CENTER', )
+    min_co: float  # 最小的坐标
+    max_co: float  # 最大的坐标
+    objs_center_co: float  # 中心坐标
+    data: dict  # 数据
+    objs_center_co: Vector
+    align_mode_location: Vector
+
+
+class AlignUi(OperatorProperty):
 
     # draw UI
     def draw_align_location(self, layout):
@@ -93,7 +143,7 @@ class AlignUi:
         self.draw_align_location(layout)
 
 
-class AlignOps:
+class AlignOps(AlignUi):
 
     def subtract_location_axis(self, obj, location):
         x, y, z = location
@@ -173,52 +223,7 @@ class AlignOps:
         return co
 
 
-class AlignProperty:
-    mode_items = (
-        ('ORIGINAL', '原点', '对齐到世界原点'),
-        ('ACTIVE', '活动项', '对齐到活动物体'),
-        ('CURSOR', '游标', '对齐到游标(缩放将重置为1)'),
-        ('GROUND', '地面', '对齐到地面'),
-        ('DISTRIBUTION', '分布', '分布对齐'),
-        ('ALIGN', '对齐', '常规对齐,可以设置每个轴的对齐方式(最大,居中,最小)'),
-    )
-
-    mode: EnumProperty(items=mode_items)
-
-    align_location: BoolProperty(name='位置', default=True)
-    align_rotation: BoolProperty(name='旋转', default=True)
-    align_scale: BoolProperty(name='缩放', default=False)
-    align_location_axis: axis_enum_property
-    align_rotation_euler_axis: axis_enum_property
-    align_scale_axis: axis_enum_property
-
-    distribution_sorted_axis: EnumProperty(
-        name='分布排序轴',
-        description='按选择轴对所选物体进行对齐并排序,以获取正确的移动位置',
-        items=(('0', 'X', '按X轴排序1分布'),
-               ('1', 'Y', '按Y轴排序1分布'),
-               ('2', 'Z', '按Z轴排序1分布'),), )
-
-    '''
-    distribution_func: EnumProperty(
-        name='分布方式',
-        description='分布物体方式',
-        items=(
-            ('spacing',     '间隔',     '统一每个物体间隔'),
-            *align_func,),
-    )'''
-
-    ground_mode: EnumProperty(
-        items=(('ALL', '所有物体', ''),
-               ('MINIMUM', '最低物体', ''),))
-
-    # 每个一个轴的对齐方式
-    x_align_func: EnumProperty(name='X', items=align_func, default='CENTER', )
-    y_align_func: EnumProperty(name='Y', items=align_func, default='CENTER', )
-    z_align_func: EnumProperty(name='Z', items=align_func, default='CENTER', )
-
-
-class AlignObject(Operator, AlignUi, AlignOps, AlignProperty):
+class AlignObject(Operator, AlignOps):
     """
     对齐物体
 
@@ -231,61 +236,6 @@ class AlignObject(Operator, AlignUi, AlignOps, AlignProperty):
     bl_idname = 'object.tool_kits_fast_align'
     bl_label = '物体对齐'
     bl_options = {'REGISTER', 'UNDO'}
-
-    def get_event_key(self, event) -> tuple[bool]:
-        """
-        反回event按键(ctrl alt shift)组合的布尔值
-
-        not_key
-        only_ctrl
-        only_alt
-        only_shift
-        shift_alt
-        ctrl_alt
-        ctrl_shift
-        ctrl_shift_alt
-        """
-
-        alt = event.alt
-        shift = event.shift
-        ctrl = event.ctrl
-
-        not_key = ((not ctrl) and (not alt) and (not shift))
-
-        only_ctrl = (ctrl and (not alt) and (not shift))
-        only_alt = ((not ctrl) and alt and (not shift))
-        only_shift = ((not ctrl) and (not alt) and shift)
-
-        shift_alt = ((not ctrl) and alt and shift)
-        ctrl_alt = (ctrl and alt and (not shift))
-
-        ctrl_shift = (ctrl and (not alt) and shift)
-        ctrl_shift_alt = (ctrl and alt and shift)
-        return not_key, only_ctrl, only_alt, only_shift, shift_alt, ctrl_alt, ctrl_shift, ctrl_shift_alt
-
-    def set_event_key(self, event: bpy.types.Event) -> None:
-        """self设置快捷键
-        向self注注event的组合布尔值
-        self.not_key  没有按下其它三个键
-        """
-        (not_key,
-         only_ctrl,
-         only_alt,
-         only_shift,
-         shift_alt,
-         ctrl_alt,
-         ctrl_shift,
-         ctrl_shift_alt) = self.get_event_key(event)
-
-        self.not_key = not_key
-        self.only_ctrl = only_ctrl
-        self.only_alt = only_alt
-        self.only_shift = only_shift
-        self.shift_alt = shift_alt
-        self.ctrl_alt = ctrl_alt
-        self.ctrl_shift = ctrl_shift
-        self.ctrl_shift_alt = ctrl_shift_alt
-        self.ctrl_or_shift_or_alt = event.ctrl or event.alt or event.shift
 
     def get_object_data(self, context):
         # 无法使用物体作为key 因为操作符有undo操作
@@ -380,13 +330,13 @@ class AlignObject(Operator, AlignUi, AlignOps, AlignProperty):
         objs_len = select_objs_len if select_objs_len == 1 else select_objs_len - 1
 
         # 每个物体之间应间隔的距离
-        self.obj_interval = self.interval_distance / (objs_len)
+        self.obj_interval = self.interval_distance / objs_len
         return objs
 
     def init_align_mode_data(self):
-        '''获取所选轴对齐方式的坐标
+        """获取所选轴对齐方式的坐标
         就是需要对齐到的坐标
-        '''
+        """
         gc = self.get_align_func_co
         x, y, z = self.x_align_func, self.y_align_func, self.z_align_func
         self.align_mode_location = Vector((gc(x)[0], gc(y)[1], gc(z)[2]))
@@ -448,7 +398,7 @@ class AlignObject(Operator, AlignUi, AlignOps, AlignProperty):
         if self.align_scale:
             self.set_scale_axis(obj, (1, 1, 1))
 
-    def align_to_distribution(self, context, obj_name):
+    def align_to_distribution(self, obj_name):
 
         if self.align_location:
 
@@ -471,7 +421,7 @@ class AlignObject(Operator, AlignUi, AlignOps, AlignProperty):
                 self.add_location_axis(obj, location)
                 self.tmp_co = data['MAX'] + Vector(location)
 
-    def align_to_ground(self, context, obj):
+    def align_to_ground(self, obj):
         if self.align_location:
             if self.ground_mode == 'ALL':
                 self.subtract_location_axis(obj, self.data[obj.name]['MIN'])

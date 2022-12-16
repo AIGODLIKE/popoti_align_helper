@@ -102,6 +102,9 @@ def screen_relevant_direction_3d_axis(context, *, return_type=None):
         av = Vector()
         av[index] = 1
         loc2d = location_3d_to_region_2d(area, region_3d, av)  # 获取轴在屏幕上的点
+        if not loc2d or not origin:
+            return ("X", "-X"), ("Y", "-Y")
+
         v_2d = loc2d - origin
 
         if v_2d == Vector((0, 0)):

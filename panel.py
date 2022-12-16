@@ -2,15 +2,13 @@ import bpy
 from bpy.types import Panel
 
 from .icons import get_icon
+from .ops import AlignObject
 from .utils import screen_relevant_direction_3d_axis
 
-align_operator = 'object.tool_kits_fast_align'
 
-
-# one
 def set_axis(layout, axis, icon, center=False):
     op = layout.operator(
-        align_operator,
+        AlignObject.bl_idname,
         icon_value=get_icon(icon),
         text='',
     )
@@ -26,6 +24,7 @@ def set_axis(layout, axis, icon, center=False):
         setattr(op, i[-1].lower() + '_align_func', value)
 
     op.align_location_axis = {i[-1] for i in axis}
+    op.align_location = True
 
 
 class ObjectAlignPanel(Panel):
@@ -39,13 +38,18 @@ class ObjectAlignPanel(Panel):
 
     def draw(self, context):
         layout = self.layout
-        layout.operator(align_operator)
+        sp = layout.split(factor=0.4, align=True)
+        a = sp.row(align=True)
+        a.scale_x = a.scale_y = 1.8
+
+        b = sp.row(align=True)
+        b.scale_y = 1.8
+        self.draw_left(a, context)
+        self.draw_right(b, context)
+
+    def draw_left(self, layout, context):
         (x, x_), (y, y_) = screen_relevant_direction_3d_axis(context)
-
-        sp = layout.split(align=True)
-        axis = ('X', 'Y', 'Z')
-
-        col = sp.column(align=True)
+        col = layout.column(align=True)
         col.alert = True
         row = col.row(align=True)
         set_axis(row, {x_, y}, 'Align_Left_Up')
@@ -60,28 +64,32 @@ class ObjectAlignPanel(Panel):
         set_axis(row, {y_}, 'Align_Down')
         set_axis(row, {x, y_}, 'Align_Right_Down')
 
-        # two
-        col = sp.column(align=True)
+    def draw_right(self, layout, context):
+        (x, x_), (y, y_) = screen_relevant_direction_3d_axis(context)
+        row = layout.row(align=True)
+        col = row.column(align=True)
+        axis = ('X', 'Y', 'Z')
 
         col.scale_y = 1.5
+        col.scale_x = 1.5
 
         def get_center_align(icon):
-            op = col.operator(align_operator,
-                              icon_value=get_icon(icon),
-                              text='',
-                              )
-            op.mode = 'ALIGN'
-            op.align_location = True
+            operator = col.operator(AlignObject.bl_idname,
+                                    icon_value=get_icon(icon),
+                                    text='',
+                                    )
+            operator.mode = 'ALIGN'
+            operator.align_location = True
             for i in axis:
-                setattr(op, i.lower() + '_align_func', 'CENTER')
-            return op
+                setattr(operator, i.lower() + '_align_func', 'CENTER')
+            return operator
 
         get_center_align('Align_Center_X').align_location_axis = {y[-1]}
         get_center_align('Align_Center_Y').align_location_axis = {x[-1]}
 
         # three 分布 地面
-        col = sp.column(align=True)
-        op = col.operator(align_operator,
+        col = row.column(align=True)
+        op = col.operator(AlignObject.bl_idname,
                           text='Distribution',
                           icon_value=get_icon('Align_Distribution_X'))
         op.mode = 'DISTRIBUTION'
@@ -89,7 +97,7 @@ class ObjectAlignPanel(Panel):
         op.align_location_axis = {x[-1]}
         op.align_location = True
 
-        op = col.operator(align_operator,
+        op = col.operator(AlignObject.bl_idname,
                           text='Distribution',
                           icon_value=get_icon('Align_Distribution_Y'))
         op.mode = 'DISTRIBUTION'
@@ -97,29 +105,35 @@ class ObjectAlignPanel(Panel):
         op.align_location_axis = {y[-1]}
         op.align_location = True
 
-        op = col.operator(align_operator,
+        op = col.operator(AlignObject.bl_idname,
                           text='Ground',
                           icon='IMPORT')
         op.mode = 'GROUND'
         op.ground_mode = 'MINIMUM'
         op.align_location_axis = {'Z'}
         op.align_location = True
+        op.align_location = True
 
         # original cursor active original
-        col = sp.column(align=True)
-        op = col.operator(align_operator,
-                          text='original',
+        col = row.column(align=True)
+        op = col.operator(AlignObject.bl_idname,
+                          text='世界原点',
                           icon='OBJECT_ORIGIN')
         op.mode = 'ORIGINAL'
-        op = col.operator(align_operator,
+        op.align_location = True
+
+        op = col.operator(AlignObject.bl_idname,
                           text='Active',
                           icon='RESTRICT_SELECT_OFF')
 
         op.mode = 'ACTIVE'
-        op = col.operator(align_operator,
+        op.align_location = True
+
+        op = col.operator(AlignObject.bl_idname,
                           text='Cursor',
                           icon='PIVOT_CURSOR')
         op.mode = 'CURSOR'
+        op.align_location = True
 
 
 class_tuples = (

@@ -1,7 +1,7 @@
 import os
 from os.path import dirname, join
 
-import bpy
+import bpy.utils.previews
 
 previews_icons = bpy.utils.previews.new()  # 用于存所有的缩略图
 thumbnail_suffix = ['.png', '.jpg']  # 缩略图后缀列表
