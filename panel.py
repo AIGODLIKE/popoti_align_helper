@@ -34,7 +34,8 @@ class ObjectAlignPanel(Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = "Tool"
-    bl_options = {'DEFAULT_CLOSED'}
+
+    # bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
         layout = self.layout
@@ -70,8 +71,7 @@ class ObjectAlignPanel(Panel):
         col = row.column(align=True)
         axis = ('X', 'Y', 'Z')
 
-        col.scale_y = 1.5
-        col.scale_x = 1.5
+        col.scale_y = col.scale_x = 1.51495
 
         def get_center_align(icon):
             operator = col.operator(AlignObject.bl_idname,

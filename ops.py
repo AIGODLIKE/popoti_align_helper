@@ -463,8 +463,7 @@ class AlignObject(Operator, AlignOps):
         col.row().prop(self, 'mode', expand=True)
 
     def invoke(self, context, event):
-        self.set_event_key(event)
-        if not self.not_key:
+        if event.ctrl or event.shift or event.alt:
             self.align_rotation = event.ctrl
             self.align_scale = event.shift
             self.align_location = event.alt
