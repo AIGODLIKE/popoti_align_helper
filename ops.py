@@ -398,7 +398,7 @@ class AlignObject(Operator, AlignOps):
         if self.align_scale:
             self.set_scale_axis(obj, (1, 1, 1))
 
-    def align_to_distribution(self, obj_name):
+    def align_to_distribution(self, context, obj_name):
 
         if self.align_location:
 
@@ -421,7 +421,7 @@ class AlignObject(Operator, AlignOps):
                 self.add_location_axis(obj, location)
                 self.tmp_co = data['MAX'] + Vector(location)
 
-    def align_to_ground(self, obj):
+    def align_to_ground(self, context, obj):
         if self.align_location:
             if self.ground_mode == 'ALL':
                 self.subtract_location_axis(obj, self.data[obj.name]['MIN'])
