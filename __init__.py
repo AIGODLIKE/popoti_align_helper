@@ -9,7 +9,7 @@ bl_info = {
     "blender": (3, 0, 0),
     "location": "Tool Panel",
     "support": "COMMUNITY",
-    # "category": "3D View",
+    "category": "3D View",
 }
 
 mod_tuple = (
