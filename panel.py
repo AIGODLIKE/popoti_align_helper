@@ -71,9 +71,8 @@ def draw_right(layout, context):
                       text='Ground',
                       icon='IMPORT')
     op.mode = 'GROUND'
-    op.ground_mode = 'MINIMUM'
+    op.ground_mode = 'ALL'
     op.align_location_axis = {'Z'}
-    op.align_location = True
     op.align_location = True
 
     # original cursor active original
