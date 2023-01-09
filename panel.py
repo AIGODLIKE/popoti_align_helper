@@ -78,7 +78,7 @@ def draw_right(layout, context):
     # original cursor active original
     col = row.column(align=True)
     op = col.operator(AlignObject.bl_idname,
-                      text='世界原点',
+                      text='Word Original',
                       icon='OBJECT_ORIGIN')
     op.mode = 'ORIGINAL'
     op.align_location = True
@@ -117,13 +117,12 @@ def draw_left(layout, context):
 
 class ObjectAlignPanel(Panel):
     bl_idname = 'ALIGN_PT_Panel'
-    bl_label = 'POPOTI对齐助手'
+    bl_label = 'POPOTI Align Helper'
 
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = "Tool"
 
-    # bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
         layout = self.layout

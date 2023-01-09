@@ -7,62 +7,53 @@ from mathutils import Vector
 from .utils import bound_to_tuple, vertices_co
 
 axis_enum_property = EnumProperty(
-    name='需要对齐的轴',
-    description='选择需要进行对齐的轴,可多选',
-    items=(('X', 'X', '对齐X轴'),
-           ('Y', 'Y', '对齐Y轴'),
-           ('Z', 'Z', '对齐Z轴'),),
+    name='Axis to be aligned',
+    description='Select the axis to be aligned, multiple choices are allowed',
+    items=(('X', 'X', 'Align X Axis'),
+           ('Y', 'Y', 'Align Y Axis'),
+           ('Z', 'Z', 'Align Z Axis'),),
     options={'ENUM_FLAG'},
     default={'X', 'Y', 'Z'})
 
-align_func = (
-    ('MIN', '最小点', '对齐到最小点'),
-    ('CENTER', '居中', '居中对齐'),
-    ('MAX', '最大点', '对齐到最大点'),)
+align_items = (
+    ('MIN', 'Min Point', 'Align to Min Point'),
+    ('CENTER', 'Center', 'Center Align'),
+    ('MAX', 'Max Point', 'Align to Max Point'),)
 
 
 class OperatorProperty:
-    """
-    distribution_func: EnumProperty(
-        name='分布方式',
-        description='分布物体方式',
-        items=(
-            ('spacing',     '间隔',     '统一每个物体间隔'),
-            *align_func,),
-    )"""
-
     mode_items = (
-        ('ORIGINAL', '世界原点', '对齐到世界原点,和重置功能相同'),
-        ('ACTIVE', '活动项', '对齐到活动物体'),
-        ('CURSOR', '游标', '对齐到游标(缩放将重置为1)'),
-        ('GROUND', '地面', '对齐到地面'),
-        ('DISTRIBUTION', '分布', '分布对齐'),
-        ('ALIGN', '对齐', '常规对齐,可以设置每个轴的对齐方式(最大,居中,最小)'),
+        ('ORIGINAL', 'Word Original', 'Aligning to the world origin is the same as resetting'),
+        ('ACTIVE', 'Active', 'Align to Active Object'),
+        ('CURSOR', 'Cursor', 'Align to Cursor(Scale reset 1)'),
+        ('GROUND', 'Ground', 'Align Ground'),
+        ('DISTRIBUTION', 'Distribution', 'Distribution Align'),
+        ('ALIGN', 'Align', 'General alignment, you can set the alignment of each axis(maximum, center, minimum)'),
     )
     mode: EnumProperty(items=mode_items)
 
-    align_location: BoolProperty(name='位置', default=True)
-    align_rotation: BoolProperty(name='旋转', default=True)
-    align_scale: BoolProperty(name='缩放', default=False)
+    align_location: BoolProperty(name='location', default=True)
+    align_rotation: BoolProperty(name='rotate', default=True)
+    align_scale: BoolProperty(name='scale', default=False)
     align_location_axis: axis_enum_property
     align_rotation_euler_axis: axis_enum_property
     align_scale_axis: axis_enum_property
 
     distribution_sorted_axis: EnumProperty(
-        name='分布排序轴',
-        description='按选择轴对所选物体进行对齐并排序,以获取正确的移动位置',
-        items=(('0', 'X', '按X轴排序1分布'),
-               ('1', 'Y', '按Y轴排序1分布'),
-               ('2', 'Z', '按Z轴排序1分布'),), )
+        name='Distribution sort axis',
+        description='Align and sort the selected objects according to the selection axis to obtain the correct movement position',
+        items=(('0', 'X', 'Sort distribution by X axis'),
+               ('1', 'Y', 'Sort distribution by Y axis'),
+               ('2', 'Z', 'Sort distribution by X axis'),), )
 
     ground_mode: EnumProperty(
-        items=(('ALL', '所有物体', ''),
-               ('MINIMUM', '最低物体', ''),))
+        items=(('ALL', 'All Object', ''),
+               ('MINIMUM', 'Lowest Object', ''),))
 
     # 每个一个轴的对齐方式
-    x_align_func: EnumProperty(name='X', items=align_func, default='CENTER', )
-    y_align_func: EnumProperty(name='Y', items=align_func, default='CENTER', )
-    z_align_func: EnumProperty(name='Z', items=align_func, default='CENTER', )
+    x_align_func: EnumProperty(name='X', items=align_items, default='CENTER', )
+    y_align_func: EnumProperty(name='Y', items=align_items, default='CENTER', )
+    z_align_func: EnumProperty(name='Z', items=align_items, default='CENTER', )
     min_co: float  # 最小的坐标
     max_co: float  # 最大的坐标
     objs_center_co: float  # 中心坐标
@@ -104,7 +95,7 @@ class AlignUi(OperatorProperty):
 
     def draw_distribution(self, layout: bpy.types.UILayout):
         row = layout.row()
-        row.label(text='排序轴')
+        row.label(text='Sort Axis')
         row.prop(self, 'distribution_sorted_axis', expand=True)
         layout.separator()
         self.draw_align_location(layout)
@@ -191,14 +182,6 @@ class AlignOps(AlignUi):
             obj.scale.z = z
 
     def get_align_func_co(self, func):
-        """获取对齐的方法需要对齐到的坐标
-
-        Args:
-            func (_type_): _description_
-
-        Returns:
-            _type_: _description_
-        """
         if func == 'MIN':
             return self.min_co
         elif func == 'MAX':
@@ -207,11 +190,6 @@ class AlignOps(AlignUi):
             return self.objs_center_co
 
     def get_align_obj_mode_co(self, obj):
-        """获取对齐的对齐方法每一个物体需要移动多少距离
-
-        Args:
-            obj (_type_): _description_
-        """
         x, y, z = self.x_align_func, self.y_align_func, self.z_align_func
 
         def gc(axis):
@@ -234,7 +212,7 @@ class AlignObject(Operator, AlignOps):
     """
 
     bl_idname = 'object.tool_kits_fast_align'
-    bl_label = '物体对齐'
+    bl_label = 'POPOTI Align Helper'
     bl_options = {'REGISTER', 'UNDO'}
 
     def get_object_data(self, context):
@@ -433,7 +411,6 @@ class AlignObject(Operator, AlignOps):
         if self.align_location:
             self.subtract_location_axis(obj, location)
 
-    # ops----
 
     def __init__(self):
         self.data = {'DATA': {'CO_TUPLE': [],
@@ -460,7 +437,7 @@ class AlignObject(Operator, AlignOps):
         if run_func:
             run_func(col)
 
-        col.row().prop(self, 'mode', expand=True)
+        col.column().prop(self, 'mode', expand=True)
 
     def invoke(self, context, event):
         if event.ctrl or event.shift or event.alt:

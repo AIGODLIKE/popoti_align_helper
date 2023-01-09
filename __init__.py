@@ -1,9 +1,9 @@
 
-from . import icons, ops, panel, preferences
+from . import icons, ops, panel, preferences,translate
 
 bl_info = {
-    "name": "POPOTI对齐助手",
-    "description": "更友好的基于观察视角的对齐",
+    "name": "POPOTI Align Helper",
+    "description": "More friendly alignment based on observation perspective",
     "author": "AIGODLIKE Community(BlenderCN辣椒,小萌新)",
     "version": (1, 0),
     "blender": (3, 0, 0),
@@ -16,6 +16,7 @@ mod_tuple = (
     ops,
     icons,
     panel,
+    translate,
     preferences,
 )
 

@@ -9,7 +9,7 @@ thumbnail_suffix = ['.png', '.jpg']  # 缩略图后缀列表
 
 def get_icon(name='None'):
     """
-    TODO load icon
+    load icon
     :param name:
     :return:
     """
