@@ -35,11 +35,8 @@ translations_dict = {
         ("*", "Lowest Object"): "最低物体",
         ("*", "All Object"): "所有物体",
         ("*", "Sort Axis"): "排序轴",
-        ("*", "Distribution sort axis"): "分布排序轴",
-        ("*", "Distribution sort axis"): "分布排序轴",
     }
 }
-
 
 def register():
     bpy.app.translations.register(__name__, translations_dict)
