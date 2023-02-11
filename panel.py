@@ -135,11 +135,9 @@ class ObjectAlignPanel(Panel):
         layout = self.layout
         sp = layout.split(factor=0.4, align=True)
         a = sp.row(align=True)
-        a.scale_x = a.scale_y = 1.8
-
         b = sp.row(align=True)
 
-        b.scale_y = 1.8
+        b.scale_y = a.scale_x = a.scale_y = 1.5
         from .preferences import Preferences
         pref = Preferences.pref_()
         if not pref.show_text:
