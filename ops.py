@@ -537,8 +537,6 @@ class AlignObject(Operator, AlignOps):
         """
 
         self.object_location_set_funcs(context)
-        print()
-        print()
         return {'FINISHED'}
 
 
