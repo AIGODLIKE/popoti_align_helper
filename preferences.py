@@ -21,7 +21,7 @@ class Preferences:
 class AddonProperty(Preferences, AddonPreferences):
     bl_idname = G_ADDON_NAME
 
-    show_text: BoolProperty(name='Show Button Text')
+    show_text: BoolProperty(name='Show Button Text', default=True)
     show_red: BoolProperty()
 
     def draw(self, context):
