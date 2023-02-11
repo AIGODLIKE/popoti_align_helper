@@ -12,7 +12,7 @@
 
 
 - 偏好设置可设置是否显示按钮文字<br>
-  ![not_show_text_button.png](image%2Fnot_show_text_button.png)
+  ![not_show_text_button.png](image/not_show_text_button.png)
 
 # 功能
 

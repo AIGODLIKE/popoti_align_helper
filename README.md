@@ -10,7 +10,7 @@ More friendly alignment based on observation perspective<br>
   The moving object will be fixed, and the distance between other objects and the moving object will be adjusted (bounding box)
 
 - Preferences can set whether to display button text<br>
-  ![not_show_text_button.png](image%2Fnot_show_text_button.png)
+  ![not_show_text_button.png](image/not_show_text_button.png)
 
 Align Mode:<br>
 
