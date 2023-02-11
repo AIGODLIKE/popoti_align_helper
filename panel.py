@@ -27,6 +27,14 @@ def set_axis(layout, axis, icon, center=False):
     op.align_location = True
 
 
+def set_text(text: str):
+    from .preferences import Preferences
+    pref = Preferences.pref_()
+    if pref.show_text:
+        return text
+    return ""
+
+
 def draw_right(layout, context):
     (x, x_), (y, y_) = screen_relevant_direction_3d_axis(context)
     row = layout.row(align=True)
@@ -52,7 +60,7 @@ def draw_right(layout, context):
     # three 分布 地面
     col = row.column(align=True)
     op = col.operator(AlignObject.bl_idname,
-                      text='Distribution',
+                      text=set_text('Distribution'),
                       icon_value=get_icon('Align_Distribution_X'))
     op.mode = 'DISTRIBUTION'
     op.distribution_sorted_axis = str(axis.index(x[-1]))
@@ -60,7 +68,7 @@ def draw_right(layout, context):
     op.align_location = True
 
     op = col.operator(AlignObject.bl_idname,
-                      text='Distribution',
+                      text=set_text('Distribution'),
                       icon_value=get_icon('Align_Distribution_Y'))
     op.mode = 'DISTRIBUTION'
     op.distribution_sorted_axis = str(axis.index(y[-1]))
@@ -68,7 +76,7 @@ def draw_right(layout, context):
     op.align_location = True
 
     op = col.operator(AlignObject.bl_idname,
-                      text='Ground',
+                      text=set_text('Ground'),
                       icon='IMPORT')
     op.mode = 'GROUND'
     op.ground_mode = 'ALL'
@@ -78,20 +86,20 @@ def draw_right(layout, context):
     # original cursor active original
     col = row.column(align=True)
     op = col.operator(AlignObject.bl_idname,
-                      text='Word Original',
+                      text=set_text('Word Original'),
                       icon='OBJECT_ORIGIN')
     op.mode = 'ORIGINAL'
     op.align_location = True
 
     op = col.operator(AlignObject.bl_idname,
-                      text='Active',
+                      text=set_text('Active'),
                       icon='RESTRICT_SELECT_OFF')
 
     op.mode = 'ACTIVE'
     op.align_location = True
 
     op = col.operator(AlignObject.bl_idname,
-                      text='Cursor',
+                      text=set_text('Cursor'),
                       icon='PIVOT_CURSOR')
     op.mode = 'CURSOR'
     op.align_location = True
@@ -127,10 +135,13 @@ class ObjectAlignPanel(Panel):
         layout = self.layout
         sp = layout.split(factor=0.4, align=True)
         a = sp.row(align=True)
-        a.scale_x = a.scale_y = 1.8
-
         b = sp.row(align=True)
-        b.scale_y = 1.8
+
+        b.scale_y = a.scale_x = a.scale_y = 1.5
+        from .preferences import Preferences
+        pref = Preferences.pref_()
+        if not pref.show_text:
+            b.scale_x = 2
         draw_left(a, context)
         draw_right(b, context)
 

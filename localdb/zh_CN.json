@@ -29,8 +29,11 @@
   "All Object": "所有物体",
   "Sort Axis": "排序轴",
   "Ground": "地面",
+  "Align Ground": "对齐地面",
   "Adjustment": "调整",
   "Distribution interval value": "分布间隔距离",
   "Active": "活动项",
+  "Fixed the nearest and farthest objects": "固定最远和最近的物体,按间距自动排列中间的物体",
+  "Adjust the distance between each object(Fixed active object)": "调整每个对象之间的距离(固定活动对象位置)",
   "Show Button Text": "显示按钮文字"
 }

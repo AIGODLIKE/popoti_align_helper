@@ -1,11 +1,20 @@
 # POPOTI Align Helper
 
-More friendly alignment based on observation perspective
+More friendly alignment based on observation perspective<br>
 ![](image/preview.jpeg)
+
+# v1.1.0
+## Add
+
+- Distribution alignment mode Add alignment by interval distance<br>
+  The moving object will be fixed, and the distance between other objects and the moving object will be adjusted (bounding box)
+
+- Preferences can set whether to display button text<br>
+  ![not_show_text_button.png](image%2Fnot_show_text_button.png)
 
 Align Mode:<br>
 
-- Word Original:Aligning to the world origin is the same as resetting <br>
+- World Original:Aligning to the world origin is the same as resetting <br>
 
 - Active:Align to Active Object<br>
 
