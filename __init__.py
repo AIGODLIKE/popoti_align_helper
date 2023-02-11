@@ -1,4 +1,4 @@
-from . import icons, ops, panel, preferences, localdb
+from . import icons, panel, preferences, localdb, ops
 
 bl_info = {
     "name": "POPOTI Align Helper",

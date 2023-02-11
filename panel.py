@@ -123,7 +123,6 @@ class ObjectAlignPanel(Panel):
     bl_region_type = 'UI'
     bl_category = "Tool"
 
-
     def draw(self, context):
         layout = self.layout
         sp = layout.split(factor=0.4, align=True)

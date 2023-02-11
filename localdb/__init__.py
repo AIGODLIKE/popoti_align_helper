@@ -1,7 +1,10 @@
 import bpy
 
+import os
+import json
 
-class TranslationHelper():
+
+class TranslationHelper:
     def __init__(self, name: str, data: dict, lang='zh_CN'):
         self.name = name
         self.translations_dict = dict()
@@ -15,24 +18,20 @@ class TranslationHelper():
     def register(self):
         try:
             bpy.app.translations.register(self.name, self.translations_dict)
-        except(ValueError):
-            pass
+        except ValueError as v:
+            print(v.args)
 
     def unregister(self):
         bpy.app.translations.unregister(self.name)
 
 
-# Set
-############
-import os
-import json
-
-dir = os.path.dirname(__file__)
+dir_name = os.path.dirname(__file__)
 help_classes = []
 
-for file in os.listdir(dir):
-    if not file.endswith('.json'): continue
-    with open(os.path.join(dir, file), 'r', encoding='utf-8') as f:
+for file in os.listdir(dir_name):
+    if not file.endswith('.json'):
+        continue
+    with open(os.path.join(dir_name, file), 'r', encoding='utf-8') as f:
         d = json.load(f)
         help_cls = TranslationHelper('popoti_align_helper_' + file, d)
         help_classes.append(help_cls)
