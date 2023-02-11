@@ -1,6 +1,6 @@
 import bpy
 import numpy as np
-from bpy.props import BoolProperty, EnumProperty
+from bpy.props import BoolProperty, EnumProperty, FloatProperty
 from bpy.types import Operator
 from mathutils import Vector
 
@@ -23,7 +23,8 @@ align_items = (
 
 class OperatorProperty:
     mode_items = (
-        ('ORIGINAL', 'Word Original', 'Aligning to the world origin is the same as resetting'),
+        ('ORIGINAL', 'Word Original',
+         'Aligning to the world origin is the same as resetting'),
         ('ACTIVE', 'Active', 'Align to Active Object'),
         ('CURSOR', 'Cursor', 'Align to Cursor(Scale reset 1)'),
         ('GROUND', 'Ground', 'Align Ground'),
@@ -31,6 +32,14 @@ class OperatorProperty:
         ('ALIGN', 'Align', 'General alignment, you can set the alignment of each axis(maximum, center, minimum)'),
     )
     mode: EnumProperty(items=mode_items)
+
+    distribution_mode: EnumProperty(items={
+        ("FIXED", "Fixed", "Fixed the nearest and farthest objects"),
+        ("ADJUSTMENT", "adjustment",
+         "Adjust the distance between each object(Fixed active object)"),
+    })
+    distribution_adjustment: FloatProperty(
+        name="Distribution Adjustment", default=1)
 
     align_location: BoolProperty(name='location', default=True)
     align_rotation: BoolProperty(name='rotate', default=True)
@@ -60,6 +69,30 @@ class OperatorProperty:
     data: dict  # 数据
     objs_center_co: Vector
     align_mode_location: Vector
+
+    @property
+    def is_fixed_mode(self):
+        return self.distribution_mode == "FIXED"
+
+    @property
+    def is_adjustment_mode(self):
+        return self.distribution_mode == "ADJUSTMENT"
+
+    @property
+    def is_distribution_mode(self):
+        return self.mode == "DISTRIBUTION"
+
+    @property
+    def is_align_mode(self):
+        return self.mode == "ALIGN"
+
+    @property
+    def is_distribution_fixed_mode(self):  # 是分布模式并且是固定间距模式
+        return self.is_fixed_mode and self.is_distribution_mode
+
+    @property
+    def is_distribution_adjustment_mode(self):  # 是分布模式并且是固定间距模式
+        return self.is_distribution_mode and self.is_adjustment_mode
 
 
 class AlignUi(OperatorProperty):
@@ -99,6 +132,9 @@ class AlignUi(OperatorProperty):
         row.prop(self, 'distribution_sorted_axis', expand=True)
         layout.separator()
         self.draw_align_location(layout)
+        if self.is_adjustment_mode:
+            layout.prop(self, "distribution_adjustment")
+        layout.row().prop(self, "distribution_mode", expand=True)
 
     def draw_ground(self, layout: bpy.types.UILayout):
         col = layout.column()
@@ -149,10 +185,20 @@ class AlignOps(AlignUi):
         x, y, z = location
         if 'X' in self.align_location_axis:
             obj.location.x += x
+        else:
+            x = 0
+
         if 'Y' in self.align_location_axis:
             obj.location.y += y
+        else:
+            y = 0
+
         if 'Z' in self.align_location_axis:
             obj.location.z += z
+        else:
+            z = 0
+
+        return x, y, z
 
     def set_location_axis(self, obj, location):
         x, y, z = location
@@ -330,6 +376,10 @@ class AlignObject(Operator, AlignOps):
         elif align:
             self.init_align_mode_data()
 
+        if distribution and self.distribution_mode == "ADJUSTMENT":
+            self.align_to_distribution_adjustment(context)
+            return
+
         for index, obj in enumerate(objs):
             '''
             如果是分布对齐objs就是物体的名称(作为键)
@@ -396,8 +446,7 @@ class AlignObject(Operator, AlignOps):
 
                 obj_lo = data['MIN']
                 location = self.obj_interval - (obj_lo - self.tmp_co)
-                self.add_location_axis(obj, location)
-                self.tmp_co = data['MAX'] + Vector(location)
+                self.tmp_co = data['MAX'] + Vector(self.add_location_axis(obj, location))
 
     def align_to_ground(self, context, obj):
         if self.align_location:
@@ -411,19 +460,38 @@ class AlignObject(Operator, AlignOps):
         if self.align_location:
             self.subtract_location_axis(obj, location)
 
+    def align_to_distribution_adjustment(self, context):
+        active_obj = context.active_object
 
-    def __init__(self):
-        self.data = {'DATA': {'CO_TUPLE': [],
-                              'DIMENSIONS': Vector()},
-                     'CENTER': {}
-                     }
-        self.get_object_data(bpy.context)
+        objs = self.distribution_order
+        active_index = objs.index(active_obj.name)
+        active_data = self.data[active_obj.name]
+        value = self.distribution_adjustment
 
-        self.min_co = np.min(self.data['DATA']['CO_TUPLE'], axis=0)
-        self.max_co = np.max(self.data['DATA']['CO_TUPLE'], axis=0)
+        self.tmp_co = active_data['MIN']
+        for obj in objs[:active_index][::-1]:
+            data = self.data[obj]
 
-        self.objs_max_min_co = self.max_co - self.min_co  # 所有所选物体的最大最小坐标
-        self.objs_center_co = (self.min_co + self.max_co) / 2
+            obj = bpy.data.objects[obj]
+
+            obj_lo = data['MAX']
+            location = Vector((-value, -value, -value)) - \
+                       (obj_lo - self.tmp_co)
+            self.add_location_axis(obj, location)
+            self.tmp_co = data['MIN'] + Vector(location)
+
+        self.tmp_co = active_data['MAX']
+        for obj_name in objs[active_index + 1:]:
+            data = self.data[obj_name]
+
+            obj = bpy.data.objects[obj_name]
+
+            obj_lo = data['MIN']
+            location = Vector((value, value, value)) - (obj_lo - self.tmp_co)
+            self.add_location_axis(obj, location)
+            self.tmp_co = data['MAX'] + Vector(location)
+
+        print(self)
 
     @classmethod
     def poll(cls, context):
@@ -440,6 +508,18 @@ class AlignObject(Operator, AlignOps):
         col.column().prop(self, 'mode', expand=True)
 
     def invoke(self, context, event):
+        self.data = {'DATA': {'CO_TUPLE': [],
+                              'DIMENSIONS': Vector()},
+                     'CENTER': {}
+                     }
+        self.get_object_data(bpy.context)
+
+        self.min_co = np.min(self.data['DATA']['CO_TUPLE'], axis=0)
+        self.max_co = np.max(self.data['DATA']['CO_TUPLE'], axis=0)
+
+        self.objs_max_min_co = self.max_co - self.min_co  # 所有所选物体的最大最小坐标
+        self.objs_center_co = (self.min_co + self.max_co) / 2
+
         if event.ctrl or event.shift or event.alt:
             self.align_rotation = event.ctrl
             self.align_scale = event.shift

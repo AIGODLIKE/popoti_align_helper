@@ -14,7 +14,7 @@ def np_matrix_dot(np_co, matrix):
     return np_co
 
 
-def _get_mesh(data):
+def _get_mesh(data: object):
     """获取物体网格数据,可直接输入物体或是网格
     如果不是网格物体则会反回错误
 
@@ -40,9 +40,8 @@ def vertices_co(data, *, matrix=None, debug=False):
         numpy.array: 反回所有顶点坐标的np阵列
     """
 
+    st = _time()
     try:
-        if debug:
-            st = _time()
         data = _get_mesh(data)
         vertices = data.vertices
         v_l = vertices.__len__()
@@ -50,7 +49,7 @@ def vertices_co(data, *, matrix=None, debug=False):
 
         vertices.foreach_get('co', np_co)
     except Exception as e:
-        print(f'获取错误:{data} 不是有效的网格或物体数据' + e.args)
+        print(f'获取错误:{data} 不是有效的网格或物体数据 {e.args}')
 
     else:
         np_co = np_co.reshape((v_l, 3))
@@ -108,21 +107,21 @@ def screen_relevant_direction_3d_axis(context, *, return_type=None):
         v_2d = loc2d - origin
 
         if v_2d == Vector((0, 0)):
-            print(axis, '轴平行于视图', v_2d, '== Vector((0, 0))', loc2d, '\n')
+            # print(axis, '轴平行于视图', v_2d, '== Vector((0, 0))', loc2d, '\n')
             continue
 
-        def get_and_set_axis(o: Vector, screen_axis, axis):
+        def get_and_set_axis(o: Vector, screen_axis, axis_):
             """判断此轴与屏幕空间的轴的角度是不是最小并设置"""
             angle = (180 * o.angle(v_2d)) / pi
             angle_ = 180 - angle
 
-            i_ = '-' + axis
+            i_ = '-' + axis_
             if angle <= data[screen_axis]['angle']:
                 data[screen_axis]['angle'] = angle
-                data[screen_axis]['axis'] = (axis, i_)
+                data[screen_axis]['axis'] = (axis_, i_)
             if angle_ <= data[screen_axis]['angle']:
                 data[screen_axis]['angle'] = angle_
-                data[screen_axis]['axis'] = (i_, axis)
+                data[screen_axis]['axis'] = (i_, axis_)
 
         get_and_set_axis(ox, 'x', axis)
         get_and_set_axis(oy, 'y', axis)
