@@ -134,7 +134,7 @@ class AlignUi(OperatorProperty):
         layout.separator()
         self.draw_align_location(layout)
         if self.is_adjustment_mode:
-            layout.prop(self, "distribution_adjustment")
+            layout.prop(self, "distribution_adjustment_value")
         layout.row().prop(self, "distribution_mode", expand=True)
 
     def draw_ground(self, layout: bpy.types.UILayout):
