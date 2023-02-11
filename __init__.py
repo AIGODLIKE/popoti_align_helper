@@ -1,4 +1,4 @@
-from . import icons, panel, preferences, localdb, ops
+from . import icons, panel, preferences, localdb, ops, test
 
 bl_info = {
     "name": "POPOTI Align Helper",
@@ -13,6 +13,7 @@ bl_info = {
 
 mod_tuple = (
     ops,
+    test,
     icons,
     panel,
     localdb,

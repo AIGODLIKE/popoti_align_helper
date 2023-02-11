@@ -1,8 +1,8 @@
 import bpy
 from .operator import OperatorTestCase
 
-DEBUG = False
 DEBUG = True
+DEBUG = False
 
 
 def run_unittest():

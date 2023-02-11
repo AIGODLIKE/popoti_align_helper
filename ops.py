@@ -35,11 +35,11 @@ class OperatorProperty:
 
     distribution_mode: EnumProperty(items={
         ("FIXED", "Fixed", "Fixed the nearest and farthest objects"),
-        ("ADJUSTMENT", "adjustment",
+        ("ADJUSTMENT", "Adjustment",
          "Adjust the distance between each object(Fixed active object)"),
     })
-    distribution_adjustment: FloatProperty(
-        name="Distribution Adjustment", default=1)
+    distribution_adjustment_value: FloatProperty(
+        name="Distribution interval value", default=1)
 
     align_location: BoolProperty(name='location', default=True)
     align_rotation: BoolProperty(name='rotate', default=True)
@@ -50,7 +50,8 @@ class OperatorProperty:
 
     distribution_sorted_axis: EnumProperty(
         name='Distribution sort axis',
-        description='Align and sort the selected objects according to the selection axis to obtain the correct movement position',
+        description='Align and sort the selected objects according'
+                    ' to the selection axis to obtain the correct movement position',
         items=(('0', 'X', 'Sort distribution by X axis'),
                ('1', 'Y', 'Sort distribution by Y axis'),
                ('2', 'Z', 'Sort distribution by X axis'),), )
@@ -466,7 +467,7 @@ class AlignObject(Operator, AlignOps):
         objs = self.distribution_order
         active_index = objs.index(active_obj.name)
         active_data = self.data[active_obj.name]
-        value = self.distribution_adjustment
+        value = self.distribution_adjustment_value
 
         self.tmp_co = active_data['MIN']
         for obj in objs[:active_index][::-1]:
