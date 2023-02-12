@@ -12,7 +12,6 @@ class VIEW3D_MT_PIE_POPOTI_ALIGN_HELPER(Menu):
         layout = self.layout
 
         pie = layout.menu_pie()
-        pie.operator_enum("mesh.select_mode", "type")
         (x, x_), (y, y_) = screen_relevant_direction_3d_axis(context)
         set_axis(pie, {x_}, 'Align_Left')
         set_axis(pie, {x}, 'Align_Right')

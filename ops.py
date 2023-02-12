@@ -33,11 +33,14 @@ class OperatorProperty:
     )
     mode: EnumProperty(items=mode_items)
 
-    distribution_mode: EnumProperty(items={
-        ("FIXED", "Fixed", "Fixed the nearest and farthest objects"),
-        ("ADJUSTMENT", "Adjustment",
-         "Adjust the distance between each object(Fixed active object)"),
-    })
+    distribution_mode: EnumProperty(
+        items={
+            ("FIXED", "Fixed", "Fixed the nearest and farthest objects"),
+            ("ADJUSTMENT", "Adjustment",
+             "Adjust the distance between each object(Fixed active object)"),
+        },
+        default='FIXED'
+    )
     distribution_adjustment_value: FloatProperty(
         name="Distribution interval value", default=1)
 
