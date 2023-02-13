@@ -1,6 +1,6 @@
 import bpy
 
-from .pie import VIEW3D_MT_PIE_POPOTI_ALIGN_HELPER
+from .pie import AlignPieMenu
 
 kmi = None
 
@@ -18,7 +18,7 @@ def reg_key():
                               alt=True,
                               )
     kmi.show_expanded = True
-    kmi.properties.name = VIEW3D_MT_PIE_POPOTI_ALIGN_HELPER.__name__
+    kmi.properties.name = AlignPieMenu.bl_idname
 
 
 def un_reg_key():

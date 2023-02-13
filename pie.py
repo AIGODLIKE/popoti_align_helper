@@ -5,8 +5,9 @@ from .panel import set_axis
 from .utils import screen_relevant_direction_3d_axis
 
 
-class VIEW3D_MT_PIE_POPOTI_ALIGN_HELPER(Menu):
-    bl_label = "Select Mode"
+class AlignPieMenu(Menu):
+    bl_label = 'POPOTI Align Helper'
+    bl_idname = 'VIEW3D_MT_PIE_POPOTI_ALIGN_HELPER'
 
     def draw(self, context):
         layout = self.layout
@@ -24,8 +25,8 @@ class VIEW3D_MT_PIE_POPOTI_ALIGN_HELPER(Menu):
 
 
 def register():
-    bpy.utils.register_class(VIEW3D_MT_PIE_POPOTI_ALIGN_HELPER)
+    bpy.utils.register_class(AlignPieMenu)
 
 
 def unregister():
-    bpy.utils.unregister_class(VIEW3D_MT_PIE_POPOTI_ALIGN_HELPER)
+    bpy.utils.unregister_class(AlignPieMenu)
