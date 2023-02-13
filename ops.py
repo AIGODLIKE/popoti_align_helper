@@ -466,10 +466,16 @@ class AlignObject(Operator, AlignOps):
 
     def align_to_distribution_adjustment(self, context):
         active_obj = context.active_object
-
         objs = self.distribution_order
-        active_index = objs.index(active_obj.name)
-        active_data = self.data[active_obj.name]
+
+        if active_obj and (active_obj.name not in objs):
+            self.report({'INFO'}, 'Not Selected Active Object')
+            active_index = -1
+            active_data = self.data[objs[0]]
+        else:
+            active_index = objs.index(active_obj.name)
+            active_data = self.data[active_obj.name]
+
         value = self.distribution_adjustment_value
 
         self.tmp_co = active_data['MIN']
@@ -494,8 +500,6 @@ class AlignObject(Operator, AlignOps):
             location = Vector((value, value, value)) - (obj_lo - self.tmp_co)
             self.add_location_axis(obj, location)
             self.tmp_co = data['MAX'] + Vector(location)
-
-        print(self)
 
     @classmethod
     def poll(cls, context):

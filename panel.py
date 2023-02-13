@@ -49,9 +49,7 @@ def get_center_align(layout, icon):
     return operator
 
 
-def draw_distribution(layout, direction):
-    (x, x_), (y, y_) = direction
-
+def draw_distribution_x(layout, x):
     op = layout.operator(AlignObject.bl_idname,
                          text=set_text('Distribution'),
                          icon_value=get_icon('Align_Distribution_X'))
@@ -60,6 +58,8 @@ def draw_distribution(layout, direction):
     op.align_location_axis = {x[-1]}
     op.align_location = True
 
+
+def draw_distribution_y(layout, y):
     op = layout.operator(AlignObject.bl_idname,
                          text=set_text('Distribution'),
                          icon_value=get_icon('Align_Distribution_Y'))
@@ -67,6 +67,12 @@ def draw_distribution(layout, direction):
     op.distribution_sorted_axis = str(AXIS.index(y[-1]))
     op.align_location_axis = {y[-1]}
     op.align_location = True
+
+
+def draw_distribution(layout, direction):
+    (x, x_), (y, y_) = direction
+    draw_distribution_x(layout, x)
+    draw_distribution_y(layout, y)
 
 
 def draw_center_align(layout, direction):

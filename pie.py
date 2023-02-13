@@ -1,7 +1,10 @@
 import bpy
 from bpy.types import Menu
 
-from .panel import set_axis, draw_ground, draw_cursor_active_original, draw_distribution, draw_center_align
+from .panel import (set_axis, draw_ground,
+                    draw_cursor_active_original,
+                    draw_distribution_y, draw_distribution_x,
+                    draw_center_align)
 from .utils import screen_relevant_direction_3d_axis
 
 
@@ -19,15 +22,16 @@ class AlignPieMenu(Menu):
         set_axis(pie, {y_}, 'Align_Down')
         set_axis(pie, {y}, 'Align_Up')
 
-        col = pie.column()
-        draw_distribution(col, direction)
-
-        col = pie.column()
-        draw_center_align(col, direction)
-
-        pie.separator()
+        draw_distribution_y(pie, y)
 
         col = pie.column(align=True)
+        col.scale_y = 1.3
+        draw_center_align(col, direction)
+
+        draw_distribution_x(pie, x)
+
+        col = pie.column(align=True)
+        col.scale_y = 1.3
         draw_ground(col)
         draw_cursor_active_original(col)
 
