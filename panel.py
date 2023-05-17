@@ -5,6 +5,8 @@ from .icons import get_icon
 from .ops import AlignObject
 from .utils import screen_relevant_direction_3d_axis
 
+AXIS = ('X', 'Y', 'Z')
+
 
 def set_axis(layout, axis, icon, center=False):
     op = layout.operator(
@@ -35,74 +37,98 @@ def set_text(text: str):
     return ""
 
 
-def draw_right(layout, context):
-    (x, x_), (y, y_) = screen_relevant_direction_3d_axis(context)
-    row = layout.row(align=True)
-    col = row.column(align=True)
-    axis = ('X', 'Y', 'Z')
+def get_center_align(layout, icon):
+    operator = layout.operator(AlignObject.bl_idname,
+                               icon_value=get_icon(icon),
+                               text='',
+                               )
+    operator.mode = 'ALIGN'
+    operator.align_location = True
+    for i in AXIS:
+        setattr(operator, i.lower() + '_align_func', 'CENTER')
+    return operator
 
-    col.scale_y = col.scale_x = 1.51495
 
-    def get_center_align(icon):
-        operator = col.operator(AlignObject.bl_idname,
-                                icon_value=get_icon(icon),
-                                text='',
-                                )
-        operator.mode = 'ALIGN'
-        operator.align_location = True
-        for i in axis:
-            setattr(operator, i.lower() + '_align_func', 'CENTER')
-        return operator
-
-    get_center_align('Align_Center_X').align_location_axis = {y[-1]}
-    get_center_align('Align_Center_Y').align_location_axis = {x[-1]}
-
-    # three 分布 地面
-    col = row.column(align=True)
-    op = col.operator(AlignObject.bl_idname,
-                      text=set_text('Distribution'),
-                      icon_value=get_icon('Align_Distribution_X'))
+def draw_distribution_x(layout, x):
+    op = layout.operator(AlignObject.bl_idname,
+                         text=set_text('Distribution'),
+                         icon_value=get_icon('Align_Distribution_X'))
     op.mode = 'DISTRIBUTION'
-    op.distribution_sorted_axis = str(axis.index(x[-1]))
+    op.distribution_sorted_axis = str(AXIS.index(x[-1]))
     op.align_location_axis = {x[-1]}
     op.align_location = True
 
-    op = col.operator(AlignObject.bl_idname,
-                      text=set_text('Distribution'),
-                      icon_value=get_icon('Align_Distribution_Y'))
+
+def draw_distribution_y(layout, y):
+    op = layout.operator(AlignObject.bl_idname,
+                         text=set_text('Distribution'),
+                         icon_value=get_icon('Align_Distribution_Y'))
     op.mode = 'DISTRIBUTION'
-    op.distribution_sorted_axis = str(axis.index(y[-1]))
+    op.distribution_sorted_axis = str(AXIS.index(y[-1]))
     op.align_location_axis = {y[-1]}
     op.align_location = True
 
-    op = col.operator(AlignObject.bl_idname,
-                      text=set_text('Ground'),
-                      icon='IMPORT')
+
+def draw_distribution(layout, direction):
+    (x, x_), (y, y_) = direction
+    draw_distribution_x(layout, x)
+    draw_distribution_y(layout, y)
+
+
+def draw_center_align(layout, direction):
+    (x, x_), (y, y_) = direction
+
+    get_center_align(layout, 'Align_Center_X').align_location_axis = {y[-1]}
+    get_center_align(layout, 'Align_Center_Y').align_location_axis = {x[-1]}
+
+
+def draw_ground(layout):
+    op = layout.operator(AlignObject.bl_idname,
+                         text=set_text('Ground'),
+                         icon='IMPORT')
     op.mode = 'GROUND'
     op.ground_mode = 'ALL'
     op.align_location_axis = {'Z'}
     op.align_location = True
 
-    # original cursor active original
-    col = row.column(align=True)
-    op = col.operator(AlignObject.bl_idname,
-                      text=set_text('Word Original'),
-                      icon='OBJECT_ORIGIN')
+
+def draw_cursor_active_original(layout):
+    op = layout.operator(AlignObject.bl_idname,
+                         text=set_text('Word Original'),
+                         icon='OBJECT_ORIGIN')
     op.mode = 'ORIGINAL'
     op.align_location = True
 
-    op = col.operator(AlignObject.bl_idname,
-                      text=set_text('Active'),
-                      icon='RESTRICT_SELECT_OFF')
+    op = layout.operator(AlignObject.bl_idname,
+                         text=set_text('Active'),
+                         icon='RESTRICT_SELECT_OFF')
 
     op.mode = 'ACTIVE'
     op.align_location = True
 
-    op = col.operator(AlignObject.bl_idname,
-                      text=set_text('Cursor'),
-                      icon='PIVOT_CURSOR')
+    op = layout.operator(AlignObject.bl_idname,
+                         text=set_text('Cursor'),
+                         icon='PIVOT_CURSOR')
     op.mode = 'CURSOR'
     op.align_location = True
+
+
+def draw_right(layout, context):
+    direction = screen_relevant_direction_3d_axis(context)
+    row = layout.row(align=True)
+    col = row.column(align=True)
+
+    col.scale_y = col.scale_x = 1.51495
+    draw_center_align(col, direction)
+
+    # three 分布 地面
+    col = row.column(align=True)
+    draw_distribution(col, direction)
+    draw_ground(col)
+
+    # original cursor active original
+    col = row.column(align=True)
+    draw_cursor_active_original(col)
 
 
 def draw_left(layout, context):

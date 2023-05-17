@@ -26,6 +26,10 @@ class AddonProperty(Preferences, AddonPreferences):
 
     def draw(self, context):
         self.layout.prop(self, 'show_text')
+        from rna_keymap_ui import draw_kmi
+        from .key import kc, km, kmi
+
+        draw_kmi(km.keymap_items, kc, km, kmi, self.layout, 0)
 
 
 class_tuple = (

@@ -1,10 +1,10 @@
-from . import icons, panel, preferences, localdb, ops, test
+from . import icons, panel, preferences, localdb, ops, test, key, pie
 
 bl_info = {
     "name": "POPOTI Align Helper",
     "description": "More friendly alignment based on observation perspective",
     "author": "AIGODLIKE Community(BlenderCN辣椒,小萌新)",
-    "version": (1, 0),
+    "version": (1, 1),
     "blender": (3, 0, 0),
     "location": "Tool Panel",
     "support": "COMMUNITY",
@@ -12,6 +12,8 @@ bl_info = {
 }
 
 mod_tuple = (
+    pie,
+    key,
     ops,
     test,
     icons,
