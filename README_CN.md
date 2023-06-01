@@ -2,6 +2,13 @@
 
 更友好的基于观察视角的对齐<br>
 ![](image/preview.jpeg)
+# v1.2.0
+
+## 添加
+- Ctrl Alt A 对齐饼菜单
+- 对齐到地面添加对齐到地面物体功能
+
+<img alt="img.png" height="256" src="image/pie_menu_align.png" width="256"/>
 
 # v1.1.0
 
