@@ -1,44 +1,68 @@
 import bpy
 import numpy as np
-from bpy.props import BoolProperty, EnumProperty, FloatProperty
+from bpy.props import BoolProperty, EnumProperty, FloatProperty, PointerProperty, StringProperty
 from bpy.types import Operator
 from mathutils import Vector
 
 from .utils import bound_to_tuple, vertices_co
 
-axis_enum_property = EnumProperty(
-    name='Axis to be aligned',
-    description='Select the axis to be aligned, multiple choices are allowed',
-    items=(('X', 'X', 'Align X Axis'),
-           ('Y', 'Y', 'Align Y Axis'),
-           ('Z', 'Z', 'Align Z Axis'),),
-    options={'ENUM_FLAG'},
-    default={'X', 'Y', 'Z'})
 
-align_items = (
-    ('MIN', 'Min Point', 'Align to Min Point'),
-    ('CENTER', 'Center', 'Center Align'),
-    ('MAX', 'Max Point', 'Align to Max Point'),)
-
-
-class OperatorProperty:
-    mode_items = (
-        ('ORIGINAL', 'Word Original',
+class Data:
+    ENUM_DISTRIBUTION_SORTED_AXIS = [('0', 'X', 'Sort distribution by X axis'),
+                                     ('1', 'Y', 'Sort distribution by Y axis'),
+                                     ('2', 'Z', 'Sort distribution by X axis'), ]
+    ENUM_GROUND_MODE = [('ALL', 'All Object', ''),
+                        ('MINIMUM', 'Lowest Object', ''), ]
+    ENUM_ALIGN_MODE = [
+        ('ORIGINAL', 'World Original',
          'Aligning to the world origin is the same as resetting'),
         ('ACTIVE', 'Active', 'Align to Active Object'),
         ('CURSOR', 'Cursor', 'Align to Cursor(Scale reset 1)'),
         ('GROUND', 'Ground', 'Align Ground'),
         ('DISTRIBUTION', 'Distribution', 'Distribution Align'),
         ('ALIGN', 'Align', 'General alignment, you can set the alignment of each axis(maximum, center, minimum)'),
-    )
-    mode: EnumProperty(items=mode_items)
+    ]
+    ENUM_DISTRIBUTION_MODE = [
+        ("FIXED", "Fixed", "Fixed the nearest and farthest objects"),
+        ("ADJUSTMENT", "Adjustment",
+         "Adjust the distance between each object(Fixed active object)"), ]
+    ENUM_ALIGN_FUNC = [
+        ('MIN', 'Min Point', 'Align to Min Point'),
+        ('CENTER', 'Center', 'Center Align'),
+        ('MAX', 'Max Point', 'Align to Max Point'),
+    ]
+
+    ENUM_AXIS = [('X', 'X', 'Align X Axis'),
+                 ('Y', 'Y', 'Align Y Axis'),
+                 ('Z', 'Z', 'Align Z Axis'),
+                 ]
+    VALID_OBJ_TYPE = ('FONT', 'OBJECT', 'META', 'SURFACE',
+                      'CURVES', 'LATTICE', 'POINTCLOUD', 'GPENCIL', 'ARMATURE')
+
+
+axis_enum_property = EnumProperty(
+    name='Axis to be aligned',
+    description='Select the axis to be aligned, multiple choices are allowed',
+    items=Data.ENUM_AXIS,
+    options={'ENUM_FLAG'},
+    default={'X', 'Y', 'Z'})
+
+
+class TempProp:
+    min_co: Vector  # 最小的坐标
+    max_co: Vector  # 最大的坐标
+    objs_max_min_co: 'list[Vector]'
+    objs_center_co: Vector  # 中心坐标
+    data: dict  # 数据
+    align_mode_location: Vector
+    index: int
+
+
+class OperatorProperty(TempProp):
+    align_mode: EnumProperty(items=Data.ENUM_ALIGN_MODE)
 
     distribution_mode: EnumProperty(
-        items={
-            ("FIXED", "Fixed", "Fixed the nearest and farthest objects"),
-            ("ADJUSTMENT", "Adjustment",
-             "Adjust the distance between each object(Fixed active object)"),
-        },
+        items=Data.ENUM_DISTRIBUTION_MODE,
         default='FIXED'
     )
     distribution_adjustment_value: FloatProperty(
@@ -55,24 +79,17 @@ class OperatorProperty:
         name='Distribution sort axis',
         description='Align and sort the selected objects according'
                     ' to the selection axis to obtain the correct movement position',
-        items=(('0', 'X', 'Sort distribution by X axis'),
-               ('1', 'Y', 'Sort distribution by Y axis'),
-               ('2', 'Z', 'Sort distribution by X axis'),), )
+        items=Data.ENUM_DISTRIBUTION_SORTED_AXIS)
 
     ground_mode: EnumProperty(
-        items=(('ALL', 'All Object', ''),
-               ('MINIMUM', 'Lowest Object', ''),))
+        items=Data.ENUM_GROUND_MODE)
+    align_to_ground_object: BoolProperty(name='Align To Ground Object')
+    ground_object_name: StringProperty(name='To Object', description='Align To Ground Object')
 
     # 每个一个轴的对齐方式
-    x_align_func: EnumProperty(name='X', items=align_items, default='CENTER', )
-    y_align_func: EnumProperty(name='Y', items=align_items, default='CENTER', )
-    z_align_func: EnumProperty(name='Z', items=align_items, default='CENTER', )
-    min_co: float  # 最小的坐标
-    max_co: float  # 最大的坐标
-    objs_center_co: float  # 中心坐标
-    data: dict  # 数据
-    objs_center_co: Vector
-    align_mode_location: Vector
+    x_align_func: EnumProperty(name='X', items=Data.ENUM_ALIGN_FUNC, default='CENTER', )
+    y_align_func: EnumProperty(name='Y', items=Data.ENUM_ALIGN_FUNC, default='CENTER', )
+    z_align_func: EnumProperty(name='Z', items=Data.ENUM_ALIGN_FUNC, default='CENTER', )
 
     @property
     def is_fixed_mode(self):
@@ -84,11 +101,15 @@ class OperatorProperty:
 
     @property
     def is_distribution_mode(self):
-        return self.mode == "DISTRIBUTION"
+        return self.align_mode == "DISTRIBUTION"
 
     @property
     def is_align_mode(self):
-        return self.mode == "ALIGN"
+        return self.align_mode == "ALIGN"
+
+    @property
+    def is_ground_mode(self):
+        return self.align_mode == "GROUND"
 
     @property
     def is_distribution_fixed_mode(self):  # 是分布模式并且是固定间距模式
@@ -97,6 +118,16 @@ class OperatorProperty:
     @property
     def is_distribution_adjustment_mode(self):  # 是分布模式并且是固定间距模式
         return self.is_distribution_mode and self.is_adjustment_mode
+
+    @property
+    def is_align_to_ground_object(self) -> bool:
+        return self.align_to_ground_object and self.ground_object and self.is_ground_mode
+
+    @property
+    def ground_object(self) -> bpy.types.Object:
+        name = self.ground_object_name
+        if name:
+            return bpy.data.objects.get(name, None)
 
 
 class AlignUi(OperatorProperty):
@@ -144,6 +175,8 @@ class AlignUi(OperatorProperty):
         col = layout.column()
 
         col.row().prop(self, 'ground_mode', expand=True)
+        col.prop(self, 'align_to_ground_object')
+        col.prop_search(self, 'ground_object_name', bpy.data, 'objects')
         col.separator(factor=2)
 
         row = col.row()
@@ -174,7 +207,8 @@ class AlignUi(OperatorProperty):
         self.draw_align_location(layout)
 
 
-class AlignOps(AlignUi):
+class GetLocation(AlignUi,
+                  Operator, ):
 
     def subtract_location_axis(self, obj, location):
         x, y, z = location
@@ -250,116 +284,57 @@ class AlignOps(AlignUi):
         co = obj_co - self.align_mode_location
         return co
 
+    def invoke_init_object_location(self, context):
+        # 无法使用物体作为key 因为操作符有undo操作,只能将name作为key
 
-class AlignObject(Operator, AlignOps):
-    """
-    对齐物体
-
-    Ctrl    对齐旋转
-    Shift   对齐缩放
-    Alt     对齐位置
-    可组合按
-    """
-
-    bl_idname = 'object.tool_kits_fast_align'
-    bl_label = 'POPOTI Align Helper'
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def get_object_data(self, context):
-        # 无法使用物体作为key 因为操作符有undo操作
-        objs = context.selected_objects.copy()
-
-        for obj in objs:
-            obj_type = (obj.type in ('FONT', 'OBJECT', 'META', 'SURFACE',
-                                     'CURVES', 'LATTICE', 'POINTCLOUD', 'GPENCIL', 'ARMATURE'))
-            no_in = obj not in self.data
-            mesh = (obj.type == 'MESH')
-            key_name = obj.name
+        for obj in context.selected_objects.copy():
+            is_valid_obj_type = (obj.type in Data.VALID_OBJ_TYPE)
+            obj_not_in_data = obj not in self.data
+            is_mesh = (obj.type == 'MESH')
+            obj_name = obj.name
             mat = obj.matrix_world
 
             def gen_data():
-                self.data[key_name] = {}
+                self.data[obj_name] = {}
 
-            if (obj_type or mesh) and no_in:
+            if (is_valid_obj_type or is_mesh) and obj_not_in_data:
                 gen_data()
                 data = np.array(bound_to_tuple(obj, matrix=mat)
-                                ) if obj_type else vertices_co(obj, matrix=mat)
+                                ) if is_valid_obj_type else vertices_co(obj, matrix=mat)
 
-                a = Vector(np.max(data, axis=0))
-                i = Vector(np.min(data, axis=0))
-                self.data[key_name]['DIMENSIONS'] = dimensions = a - i
+                loc_max = Vector(np.max(data, axis=0))
+                loc_min = Vector(np.min(data, axis=0))
+                self.data[obj_name]['DIMENSIONS'] = dimensions = loc_max - loc_min
 
-                center = (i + dimensions / 2).freeze()
+                center = (loc_min + dimensions / 2).freeze()
 
-                self.data[key_name]['CENTER'] = center
+                self.data[obj_name]['CENTER'] = center
 
-                self.data['DATA']['CO_TUPLE'] += [a, i]  # 添加最大最小点
+                self.data['DATA']['CO_TUPLE'] += [loc_max, loc_min]  # 添加最大最小点
                 self.data['DATA']['DIMENSIONS'] += dimensions  # 添加物体的尺寸
-                self.data[key_name]['MIN'] = i
-                self.data[key_name]['MAX'] = a
+                self.data[obj_name]['MIN'] = loc_min
+                self.data[obj_name]['MAX'] = loc_max
 
                 if center not in self.data['CENTER']:
                     self.data['CENTER'][center] = []
 
-                self.data['CENTER'][center].append(key_name)
-            elif no_in:
+                self.data['CENTER'][center].append(obj_name)
+            elif obj_not_in_data:
                 gen_data()
-                self.data[key_name]['MIN'] = self.data[key_name]['MAX'] = a = i = obj.location
-                self.data['DATA']['CO_TUPLE'] += [a, i]
+                center = self.data[obj_name]['MIN'] = self.data[obj_name][
+                    'MAX'] = loc_max = loc_min = obj.location.copy().freeze()
+
+                self.data['DATA']['CO_TUPLE'] += [loc_max, loc_min]
 
                 dimensions = Vector((0, 0, 0))
-                self.data[key_name]['DIMENSIONS'] = dimensions
-                self.data[key_name]['CENTER'] = i
+                self.data[obj_name]['DIMENSIONS'] = dimensions
+                self.data[obj_name]['CENTER'] = center
                 self.data['DATA']['DIMENSIONS'] += dimensions
 
-        '''print('\nprint data')
-        for i in self.data:
-            a = self.data[i]
-            print(i)
-            for j in a:
-                print(j, '\t', a[j])
-            print('\n')'''
+                if center not in self.data['CENTER']:
+                    self.data['CENTER'][center] = []
 
-    def init_distribution_data(self):
-        """
-        如果是分布对齐
-        需要先算一下每一个物体的中心点排序,按中心点大小来排,可以让使用者选择进行排序的轴xyz
-        排序好之后要再排一次,以解决两个中心点在同一个位置的情况避免排序错误
-        然后再对每一个物体进行移动(两端的物体不会进行移动[1:-1])
-        如果所选物体的数量小于2，也没关系切出来是个空的
-        """
-
-        # 使用选定的轴进行一次排序
-        center_key = int(self.distribution_sorted_axis)
-        distribution_center_sorted = sorted(
-            self.data['CENTER'].keys(), key=lambda x: x[center_key])
-
-        # 再排一次序，对比出中点一至的多个物体的次序
-        objs = []
-        for center in distribution_center_sorted:
-            if len(self.data['CENTER'][center]) > 1:
-
-                objs += sorted(self.data['CENTER'][center],
-                               key=lambda x: self.data[x]['DIMENSIONS'])
-            else:
-                objs += self.data['CENTER'][center]
-
-        self.distribution_order = objs
-
-        max_co = self.data[objs[-1]]['MAX']
-        min_co = self.data[objs[0]]['MIN']
-
-        dimensions_max_min_co = max_co - min_co  # 中心点第一个和最后一个物体的最大最小坐标
-        dimensions = self.data['DATA']['DIMENSIONS']  # 物体的总尺寸长度
-        self.interval_distance = dimensions_max_min_co - dimensions  # 所有物体应间隔的总长度
-
-        # 如果所选只有一个物体则不减 除0 错误
-        select_objs_len = bpy.context.selected_objects.__len__()
-        objs_len = select_objs_len if select_objs_len == 1 else select_objs_len - 1
-
-        # 每个物体之间应间隔的距离
-        self.obj_interval = self.interval_distance / objs_len
-        return objs
+                self.data['CENTER'][center].append(obj_name)
 
     def init_align_mode_data(self):
         """获取所选轴对齐方式的坐标
@@ -369,18 +344,21 @@ class AlignObject(Operator, AlignOps):
         x, y, z = self.x_align_func, self.y_align_func, self.z_align_func
         self.align_mode_location = Vector((gc(x)[0], gc(y)[1], gc(z)[2]))
 
+
+class SetLocation(GetLocation):
+
     def object_location_set_funcs(self, context):
-        mode = self.mode
-        distribution = (mode == 'DISTRIBUTION')
-        align = (mode == 'ALIGN')
+        align_mode = self.align_mode
+        is_distribution_mode = (align_mode == 'DISTRIBUTION')
+        is_align_mode = (align_mode == 'ALIGN')
 
         objs = context.selected_objects.copy()
-        if distribution:
+        if is_distribution_mode:
             objs = self.init_distribution_data()
-        elif align:
+        elif is_align_mode:
             self.init_align_mode_data()
 
-        if distribution and self.distribution_mode == "ADJUSTMENT":
+        if is_distribution_mode and self.distribution_mode == "ADJUSTMENT":
             self.align_to_distribution_adjustment(context)
             return
 
@@ -389,7 +367,7 @@ class AlignObject(Operator, AlignOps):
             如果是分布对齐objs就是物体的名称(作为键)
             否则objs就是物体
             '''
-            run_func = getattr(self, f'align_to_{mode.lower()}', None)
+            run_func = getattr(self, f'align_to_{align_mode.lower()}', None)
             self.index = index  # 分布对齐用,查找当前物体需要对齐到的目标
             if run_func:
                 run_func(context, obj)
@@ -454,10 +432,16 @@ class AlignObject(Operator, AlignOps):
 
     def align_to_ground(self, context, obj):
         if self.align_location:
+
             if self.ground_mode == 'ALL':
-                self.subtract_location_axis(obj, self.data[obj.name]['MIN'])
+                location = self.data[obj.name]['MIN']
             else:
-                self.subtract_location_axis(obj, self.min_co)
+                location = self.min_co
+
+            if self.is_align_to_ground_object:
+                self.align_to_ground_ray_cast(obj, location)
+                return
+            self.subtract_location_axis(obj, location)
 
     def align_to_align(self, context, obj):
         location = self.get_align_obj_mode_co(obj)
@@ -501,6 +485,70 @@ class AlignObject(Operator, AlignOps):
             self.add_location_axis(obj, location)
             self.tmp_co = data['MAX'] + Vector(location)
 
+    def init_distribution_data(self):
+        """
+        如果是分布对齐
+        需要先算一下每一个物体的中心点排序,按中心点大小来排,可以让使用者选择进行排序的轴xyz
+        排序好之后要再排一次,以解决两个中心点在同一个位置的情况避免排序错误
+        然后再对每一个物体进行移动(两端的物体不会进行移动[1:-1])
+        如果所选物体的数量小于2，也没关系切出来是个空的
+        """
+
+        # 使用选定的轴进行一次排序
+        center_key = int(self.distribution_sorted_axis)
+        distribution_center_sorted = sorted(
+            self.data['CENTER'].keys(), key=lambda x: x[center_key])
+
+        # 再排一次序，对比出中点一至的多个物体的次序
+        objs = []
+        for center in distribution_center_sorted:
+            if len(self.data['CENTER'][center]) > 1:
+
+                objs += sorted(self.data['CENTER'][center],
+                               key=lambda x: self.data[x]['DIMENSIONS'])
+            else:
+                objs += self.data['CENTER'][center]
+        print('objs', objs, distribution_center_sorted)
+        self.distribution_order = objs
+
+        max_co = self.data[objs[-1]]['MAX']
+        min_co = self.data[objs[0]]['MIN']
+
+        dimensions_max_min_co = max_co - min_co  # 中心点第一个和最后一个物体的最大最小坐标
+        dimensions = self.data['DATA']['DIMENSIONS']  # 物体的总尺寸长度
+        self.interval_distance = dimensions_max_min_co - dimensions  # 所有物体应间隔的总长度
+
+        # 如果所选只有一个物体则不减 除0 错误
+        select_objs_len = bpy.context.selected_objects.__len__()
+        objs_len = select_objs_len if select_objs_len == 1 else select_objs_len - 1
+
+        # 每个物体之间应间隔的距离
+        self.obj_interval = self.interval_distance / objs_len
+        return objs
+
+    def align_to_ground_ray_cast(self, obj, location):
+        ray_obj = self.ground_object.evaluated_get(bpy.context.evaluated_depsgraph_get())
+        direction = Vector((0, 0, -1))
+        (result, loc, normal, index) = ray_obj.ray_cast(location, direction)
+        print(obj.name, loc, location)
+        if result:
+            self.subtract_location_axis(obj, location - loc)
+
+
+class AlignObject(SetLocation):
+    """
+    对齐物体
+
+    Ctrl    对齐旋转
+    Shift   对齐缩放
+    Alt     对齐位置
+    可组合按
+    """
+
+    bl_idname = 'object.tool_kits_fast_align'
+    bl_label = 'POPOTI Align Helper'
+    bl_options = {'REGISTER', 'UNDO'}
+
     @classmethod
     def poll(cls, context):
         return context.selected_objects.__len__()
@@ -509,18 +557,18 @@ class AlignObject(Operator, AlignOps):
         layout = self.layout
         col = layout.column()
 
-        run_func = getattr(self, f'draw_{self.mode.lower()}', None)
+        run_func = getattr(self, f'draw_{self.align_mode.lower()}', None)
         if run_func:
             run_func(col)
 
-        col.column().prop(self, 'mode', expand=True)
+        col.column().prop(self, 'align_mode', expand=True)
 
     def invoke(self, context, event):
         self.data = {'DATA': {'CO_TUPLE': [],
                               'DIMENSIONS': Vector()},
                      'CENTER': {}
                      }
-        self.get_object_data(bpy.context)
+        self.invoke_init_object_location(bpy.context)
 
         self.min_co = np.min(self.data['DATA']['CO_TUPLE'], axis=0)
         self.max_co = np.max(self.data['DATA']['CO_TUPLE'], axis=0)

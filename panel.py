@@ -14,7 +14,7 @@ def set_axis(layout, axis, icon, center=False):
         icon_value=get_icon(icon),
         text='',
     )
-    op.mode = 'ALIGN'
+    op.align_mode = 'ALIGN'
 
     if axis == 'CENTER':
         center = True
@@ -42,7 +42,7 @@ def get_center_align(layout, icon):
                                icon_value=get_icon(icon),
                                text='',
                                )
-    operator.mode = 'ALIGN'
+    operator.align_mode = 'ALIGN'
     operator.align_location = True
     for i in AXIS:
         setattr(operator, i.lower() + '_align_func', 'CENTER')
@@ -53,7 +53,7 @@ def draw_distribution_x(layout, x):
     op = layout.operator(AlignObject.bl_idname,
                          text=set_text('Distribution'),
                          icon_value=get_icon('Align_Distribution_X'))
-    op.mode = 'DISTRIBUTION'
+    op.align_mode = 'DISTRIBUTION'
     op.distribution_sorted_axis = str(AXIS.index(x[-1]))
     op.align_location_axis = {x[-1]}
     op.align_location = True
@@ -63,7 +63,7 @@ def draw_distribution_y(layout, y):
     op = layout.operator(AlignObject.bl_idname,
                          text=set_text('Distribution'),
                          icon_value=get_icon('Align_Distribution_Y'))
-    op.mode = 'DISTRIBUTION'
+    op.align_mode = 'DISTRIBUTION'
     op.distribution_sorted_axis = str(AXIS.index(y[-1]))
     op.align_location_axis = {y[-1]}
     op.align_location = True
@@ -86,7 +86,7 @@ def draw_ground(layout):
     op = layout.operator(AlignObject.bl_idname,
                          text=set_text('Ground'),
                          icon='IMPORT')
-    op.mode = 'GROUND'
+    op.align_mode = 'GROUND'
     op.ground_mode = 'ALL'
     op.align_location_axis = {'Z'}
     op.align_location = True
@@ -94,22 +94,22 @@ def draw_ground(layout):
 
 def draw_cursor_active_original(layout):
     op = layout.operator(AlignObject.bl_idname,
-                         text=set_text('Word Original'),
+                         text=set_text('World Original'),
                          icon='OBJECT_ORIGIN')
-    op.mode = 'ORIGINAL'
+    op.align_mode = 'ORIGINAL'
     op.align_location = True
 
     op = layout.operator(AlignObject.bl_idname,
                          text=set_text('Active'),
                          icon='RESTRICT_SELECT_OFF')
 
-    op.mode = 'ACTIVE'
+    op.align_mode = 'ACTIVE'
     op.align_location = True
 
     op = layout.operator(AlignObject.bl_idname,
                          text=set_text('Cursor'),
                          icon='PIVOT_CURSOR')
-    op.mode = 'CURSOR'
+    op.align_mode = 'CURSOR'
     op.align_location = True
 
 

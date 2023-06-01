@@ -1,7 +1,7 @@
 {
   "3D View: POPOTI Align Helper": "3D 视图: POPOTI对齐助手",
   "POPOTI Align Helper": "POPOTI对齐助手",
-  "Word Original": "世界原点",
+  "World Original": "世界原点",
   "More friendly alignment based on observation perspective": "更友好的基于观察视角的对齐",
   "Tool Panel": "工具面板",
   "Axis to be aligned": "需要对齐的轴",
@@ -36,5 +36,7 @@
   "Not Selected Active Object": "未选择活动物体",
   "Fixed the nearest and farthest objects": "固定最远和最近的物体,按间距自动排列中间的物体",
   "Adjust the distance between each object(Fixed active object)": "调整每个对象之间的距离(固定活动对象位置)",
-  "Show Button Text": "显示按钮文字"
+  "Show Button Text": "显示按钮文字",
+  "Align To Ground Object": "对齐到地面物体",
+  "To Object": "到物体"
 }

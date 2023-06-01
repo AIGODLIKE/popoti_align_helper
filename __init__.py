@@ -3,12 +3,12 @@ from . import icons, panel, preferences, localdb, ops, test, key, pie
 bl_info = {
     "name": "POPOTI Align Helper",
     "description": "More friendly alignment based on observation perspective",
-    "author": "AIGODLIKE Community(BlenderCN辣椒,小萌新)",
+    "author": "AIGODLIKE社区,小萌新",
     "version": (1, 1),
     "blender": (3, 0, 0),
     "location": "Tool Panel",
     "support": "COMMUNITY",
-    "category": "3D View",
+    "category": "辣椒出品",
 }
 
 mod_tuple = (
