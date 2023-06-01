@@ -68,9 +68,9 @@ class OperatorProperty(TempProp):
     distribution_adjustment_value: FloatProperty(
         name="Distribution interval value", default=1)
 
-    align_location: BoolProperty(name='location', default=True)
-    align_rotation: BoolProperty(name='rotate', default=True)
-    align_scale: BoolProperty(name='scale', default=False)
+    align_location: BoolProperty(name='Location', default=True)
+    align_rotation: BoolProperty(name='Rotate', default=True)
+    align_scale: BoolProperty(name='Scale', default=False)
     align_location_axis: axis_enum_property
     align_rotation_euler_axis: axis_enum_property
     align_scale_axis: axis_enum_property
