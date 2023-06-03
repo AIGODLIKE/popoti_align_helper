@@ -10,7 +10,10 @@ def clear_scene():
     for sc in bpy.data.scenes:
         if sc != new:
             bpy.data.scenes.remove(sc)
-    bpy.ops.outliner.orphans_purge(do_local_ids=True, do_linked_ids=True, do_recursive=True)
+    bpy.ops.outliner.orphans_purge(
+        do_local_ids=True,
+        do_linked_ids=True,
+        do_recursive=True)
 
 
 class OperatorTestCase(unittest.TestCase):
@@ -18,7 +21,7 @@ class OperatorTestCase(unittest.TestCase):
     def setUp(self):
         print('清理场景')
         clear_scene()
-        for i in range(10):
+        for _ in range(10):
             bpy.ops.mesh.primitive_monkey_add()
 
         bpy.ops.object.select_all(action='SELECT')

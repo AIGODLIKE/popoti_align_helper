@@ -70,13 +70,13 @@ def draw_distribution_y(layout, y):
 
 
 def draw_distribution(layout, direction):
-    (x, x_), (y, y_) = direction
+    (x, _), (y, _) = direction
     draw_distribution_x(layout, x)
     draw_distribution_y(layout, y)
 
 
 def draw_center_align(layout, direction):
-    (x, x_), (y, y_) = direction
+    (x, _), (y, _) = direction
 
     get_center_align(layout, 'Align_Center_X').align_location_axis = {y[-1]}
     get_center_align(layout, 'Align_Center_Y').align_location_axis = {x[-1]}

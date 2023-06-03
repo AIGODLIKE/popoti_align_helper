@@ -1,7 +1,6 @@
 import bpy
 from .operator import OperatorTestCase
 
-DEBUG = True
 DEBUG = False
 
 

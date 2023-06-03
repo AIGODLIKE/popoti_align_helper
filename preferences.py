@@ -10,7 +10,8 @@ G_ADDON_NAME = basename(dirname(realpath(__file__)))
 class Preferences:
     @staticmethod
     def pref_() -> 'AddonPreferences':
-        return bpy.context.preferences.addons[AddonProperty.bl_idname].preferences
+        bl_idname = AddonProperty.bl_idname
+        return bpy.context.preferences.addons[bl_idname].preferences
 
     @property
     def pref(self) -> 'AddonPreferences':

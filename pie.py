@@ -16,7 +16,8 @@ class AlignPieMenu(Menu):
         layout = self.layout
 
         pie = layout.menu_pie()
-        (x, x_), (y, y_) = direction = screen_relevant_direction_3d_axis(context)
+        direction = screen_relevant_direction_3d_axis(context)
+        (x, x_), (y, y_) = direction
         set_axis(pie, {x_}, 'Align_Left')
         set_axis(pie, {x}, 'Align_Right')
         set_axis(pie, {y_}, 'Align_Down')
