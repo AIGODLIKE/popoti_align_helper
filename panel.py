@@ -168,8 +168,9 @@ class ObjectAlignPanel(Panel):
         pref = Preferences.pref_()
         if not pref.show_text:
             b.scale_x = 2
-        draw_left(a, context)
-        draw_right(b, context)
+        if getattr(context.space_data, 'region_3d', False):
+            draw_left(a, context)
+            draw_right(b, context)
 
 
 class_tuples = (
