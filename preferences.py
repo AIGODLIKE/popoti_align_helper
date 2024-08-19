@@ -1,10 +1,8 @@
-from os.path import basename, realpath, dirname
-
 import bpy
 from bpy.props import BoolProperty
 from bpy.types import AddonPreferences
 
-G_ADDON_NAME = basename(dirname(realpath(__file__)))
+G_ADDON_NAME = __package__
 
 
 class Preferences:
