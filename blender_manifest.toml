@@ -1,0 +1,11 @@
+schema_version = "1.0.0"
+
+blender_version_min = "4.2.0"
+id = "popoti_align_helper"
+license = ["UNKNOWN", ]
+maintainer = "AIGODLIKE社区,小萌新"
+name = "POPOTI Align Helper"
+tagline = "More friendly alignment based on observation perspective"
+type = "add-on"
+version = "1.2.1"
+tags = ["幻之境", "AIGODLIKE Community"]
