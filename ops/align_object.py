@@ -9,7 +9,7 @@ from bpy.props import (
 from bpy.types import Operator
 from mathutils import Vector
 
-from .utils import bound_to_tuple, vertices_co
+from ..utils import bound_to_tuple, vertices_co
 
 
 class Data:
