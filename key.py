@@ -22,7 +22,10 @@ def reg_key():
 
 
 def un_reg_key():
-    km.keymap_items.remove(kmi)
+    global kmi, km
+    if kmi in km.keymap_items.values():
+        km.keymap_items.remove(kmi)
+        kmi = None
 
 
 def register():
