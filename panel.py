@@ -134,7 +134,6 @@ def draw_right(layout, context):
 def draw_left(layout, context):
     (x, x_), (y, y_) = screen_relevant_direction_3d_axis(context)
     col = layout.column(align=True)
-    col.alert = True
     row = col.row(align=True)
     set_axis(row, {x_, y}, 'Align_Left_Up')
     set_axis(row, {y}, 'Align_Up')
@@ -159,15 +158,20 @@ class ObjectAlignPanel(Panel):
 
     def draw(self, context):
         layout = self.layout
-        sp = layout.split(factor=0.4, align=True)
-        a = sp.row(align=True)
-        b = sp.row(align=True)
+        if context.region.width > 700:
+            sp = layout.split(factor=0.4, align=True)
+            a = sp.row(align=True)
+            b = sp.row(align=True)
+            b.scale_y = a.scale_x = a.scale_y = 1.5
 
-        b.scale_y = a.scale_x = a.scale_y = 1.5
-        from .preferences import Preferences
-        pref = Preferences.pref_()
-        if not pref.show_text:
-            b.scale_x = 2
+            from .preferences import Preferences
+            pref = Preferences.pref_()
+            if not pref.show_text:
+                b.scale_x = 2
+        else:
+            a = layout.column(align=True)
+            b = layout.column(align=True)
+
         if getattr(context.space_data, 'region_3d', False):
             draw_left(a, context)
             draw_right(b, context)
