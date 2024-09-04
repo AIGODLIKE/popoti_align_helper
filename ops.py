@@ -49,12 +49,23 @@ class Data:
                       'CURVES', 'LATTICE', 'POINTCLOUD', 'GPENCIL', 'ARMATURE')
 
 
-axis_enum_property = EnumProperty(
+axis_enum_property = dict(
     name='Axis to be aligned',
     description='Select the axis to be aligned, multiple choices are allowed',
     items=Data.ENUM_AXIS,
-    options={'ENUM_FLAG'},
-    default={'X', 'Y', 'Z'})
+    options={'ENUM_FLAG'})
+
+
+def __get_v__(self, key, default):
+    key = f"{self.align_mode}_{key}"
+    if key in self:
+        return self[key]
+    else:
+        return default
+
+
+def __set_v__(self, key, value):
+    self[f"{self.align_mode}_{key}"] = value
 
 
 class TempProp:
@@ -67,6 +78,9 @@ class TempProp:
     index: int
 
 
+d = 1 << 0 + 1 << 1 + 1 << 2
+
+
 class OperatorProperty(TempProp):
     align_mode: EnumProperty(items=Data.ENUM_ALIGN_MODE)
 
@@ -77,12 +91,33 @@ class OperatorProperty(TempProp):
     distribution_adjustment_value: FloatProperty(
         name="Distribution interval value", default=1)
 
-    align_location: BoolProperty(name='Location', default=True)
-    align_rotation: BoolProperty(name='Rotate', default=True)
-    align_scale: BoolProperty(name='Scale', default=False)
-    align_location_axis: axis_enum_property
-    align_rotation_euler_axis: axis_enum_property
-    align_scale_axis: axis_enum_property
+    align_location: BoolProperty(
+        name='Location',
+        get=lambda self: __get_v__(self, "Location", default=True),
+        set=lambda self, value: __set_v__(self, "Location", value))
+    align_rotation: BoolProperty(
+        name='Rotate',
+        get=lambda self: __get_v__(self, "Rotate", default=True),
+        set=lambda self, value: __set_v__(self, "Rotate", value))
+    align_scale: BoolProperty(
+        name='Scale',
+        get=lambda self: __get_v__(self, "Scale", default=False),
+        set=lambda self, value: __set_v__(self, "Scale", value))
+    align_location_axis: EnumProperty(
+        # get=lambda self: __get_v__(self, "Location Axis", default=d),
+        # set=lambda self, value: __set_v__(self, "Location Axis", value),
+        **axis_enum_property
+    )
+    align_rotation_euler_axis: EnumProperty(
+        get=lambda self: __get_v__(self, "Rotation Euler Axis", default=d),
+        set=lambda self, value: __set_v__(self, "Rotation Euler Axis", value),
+        **axis_enum_property
+    )
+    align_scale_axis: EnumProperty(
+        get=lambda self: __get_v__(self, "Scale Axis", default=d),
+        set=lambda self, value: __set_v__(self, "Scale Axis", value),
+        **axis_enum_property
+    )
 
     distribution_sorted_axis: EnumProperty(
         name='Distribution sort axis',
@@ -535,7 +570,6 @@ class SetLocation(GetLocation):
                                key=lambda x: self.data[x]['DIMENSIONS'])
             else:
                 objs += self.data['CENTER'][center]
-        print('objs', objs, distribution_center_sorted)
         self.distribution_order = objs
 
         max_co = self.data[objs[-1]]['MAX']
