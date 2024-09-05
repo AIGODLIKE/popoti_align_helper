@@ -88,11 +88,9 @@ class LocationSet:
                 # 是第一个或最后一个物体，不用操作
             else:
                 obj = bpy.data.objects[obj_name]
-
                 '''
                 # if self.distribution_func == 'spacing':
                     # 分布间隔对齐'''
-
                 obj_lo = data['MIN']
                 location = self.obj_interval - (obj_lo - self.tmp_co)
                 co = Vector(self.add_location_axis(obj, location))
@@ -100,12 +98,10 @@ class LocationSet:
 
     def align_to_ground(self, context, obj):
         if self.align_location:
-
             if self.ground_mode == 'ALL':
                 location = self.data[obj.name]['MIN']
             else:
                 location = self.min_co
-
             if self.is_align_to_ground_object:
                 self.align_to_ground_ray_cast(obj, location)
                 return
