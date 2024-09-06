@@ -19,7 +19,8 @@ ENUM_DISTRIBUTION_SORTED_AXIS = [
     ('1', 'Y', 'Sort distribution by Y axis'),
     ('2', 'Z', 'Sort distribution by X axis'), ]
 ENUM_GROUND_MODE = [('ALL', 'All Object', ''),
-                    ('MINIMUM', 'Lowest Object', ''), ]
+                    ('MINIMUM', 'Lowest Object', ''),
+                    ]
 ENUM_ALIGN_MODE = [
     ('ORIGINAL', 'World Original',
      'Aligning to the world origin is the same as resetting'),
