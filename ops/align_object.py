@@ -142,8 +142,8 @@ class AlignObject(
 
         for obj in context.selected_objects:
             mat = get_matrix(self, obj.matrix_world, Matrix())
-            print(obj.name, obj.matrix_world, mat)
             obj.location = mat.to_translation()
+            context.view_layer.update()
 
 
 class_tuples = (
