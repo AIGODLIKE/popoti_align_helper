@@ -48,7 +48,7 @@ class UI:
     def draw_ground(self, layout: bpy.types.UILayout):
         col = layout.column()
 
-        col.row().prop(self, 'ground_mode', expand=True)
+        col.row().prop(self, 'ground_down_mode', expand=True)
         col.prop(self, 'align_to_ground_object')# TODO ground object
         col.prop_search(self, 'ground_object_name', bpy.data, 'objects')
         col.separator(factor=2)

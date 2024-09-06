@@ -18,9 +18,14 @@ ENUM_DISTRIBUTION_SORTED_AXIS = [
     ('0', 'X', 'Sort distribution by X axis'),
     ('1', 'Y', 'Sort distribution by Y axis'),
     ('2', 'Z', 'Sort distribution by X axis'), ]
-ENUM_GROUND_MODE = [('ALL', 'All Object', ''),
-                    ('MINIMUM', 'Lowest Object', ''),
-                    ]
+ENUM_GROUND_DOWN_MODE = [('ALL', 'All Object', ''),
+                         ('MINIMUM', 'Lowest Object', ''),
+                         ]
+ENUM_GROUND_PLANE_MODE = [
+    ('GROUND', 'Ground', 'Align To Ground'),
+    ('RAY_CASTING', 'Ray Casting', 'Align To Z Ray Casting Object'),
+    ('DESIGNATED_OBJECT', 'Designated Object', 'Align to Designated Object Z'),
+]
 ENUM_ALIGN_MODE = [
     ('ORIGINAL', 'World Original',
      'Aligning to the world origin is the same as resetting'),
@@ -117,8 +122,9 @@ class OperatorProperty:
                     'position',
         items=ENUM_DISTRIBUTION_SORTED_AXIS)
 
-    ground_mode: EnumProperty(
-        items=ENUM_GROUND_MODE)
+    ground_down_mode: EnumProperty(items=ENUM_GROUND_DOWN_MODE)
+    ground_plane_mode: EnumProperty(items=ENUM_GROUND_PLANE_MODE)
+
     align_to_ground_object: BoolProperty(name='Align To Ground Object')
     ground_object_name: StringProperty(
         name='To Object',

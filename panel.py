@@ -87,7 +87,7 @@ def draw_ground(layout):
                          text=set_text('Ground'),
                          icon='IMPORT')
     op.align_mode = 'GROUND'
-    op.ground_mode = 'ALL'
+    op.ground_down_mode = 'ALL'
     op.align_location_axis = {'Z'}
     op.align_location = True
 
