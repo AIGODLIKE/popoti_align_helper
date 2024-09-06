@@ -36,16 +36,12 @@ ENUM_DISTRIBUTION_MODE = [
     ("FIXED", "Fixed", "Fixed the nearest and farthest objects"),
     ("ADJUSTMENT", "Adjustment",
      "Adjust the distance between each object(Fixed active object)"), ]
-ENUM_ALIGN_FUNC = [
-    ('MIN', 'Min Point', 'Align to Min Point'),
-    ('CENTER', 'Center', 'Center Align'),
-    ('MAX', 'Max Point', 'Align to Max Point'),
-]
 
 ENUM_AXIS = [('X', 'X', 'Align X Axis'),
              ('Y', 'Y', 'Align Y Axis'),
              ('Z', 'Z', 'Align Z Axis'),
              ]
+
 VALID_OBJ_TYPE = ('FONT', 'OBJECT', 'META', 'SURFACE',
                   'CURVES', 'LATTICE', 'POINTCLOUD', 'GPENCIL', 'ARMATURE')
 
@@ -54,6 +50,15 @@ axis_enum_property = dict(
     description='Select the axis to be aligned, multiple choices are allowed',
     items=ENUM_AXIS,
     options={'ENUM_FLAG'})
+
+align_method_enum_property = dict(
+    items=[
+        ('MIN', 'Min Point', 'Align to Min Point'),
+        ('CENTER', 'Center', 'Center Align'),
+        ('MAX', 'Max Point', 'Align to Max Point'),
+    ],
+    default='CENTER',
+)
 
 default_xyz_enum = 263
 
@@ -93,14 +98,14 @@ class OperatorProperty:
         set=lambda self, value: __set_v__(self, "Location Axis", value),
         **axis_enum_property
     )
-    align_rotation_euler_axis: EnumProperty(
-        get=lambda self: __get_v__(self, "Rotation Euler Axis", default=default_xyz_enum),
-        set=lambda self, value: __set_v__(self, "Rotation Euler Axis", value),
+    align_rotation_axis: EnumProperty(
+        # get=lambda self: __get_v__(self, "Rotation Euler Axis", default=default_xyz_enum),
+        # set=lambda self, value: __set_v__(self, "Rotation Euler Axis", value),
         **axis_enum_property
     )
     align_scale_axis: EnumProperty(
-        get=lambda self: __get_v__(self, "Scale Axis", default=default_xyz_enum),
-        set=lambda self, value: __set_v__(self, "Scale Axis", value),
+        # get=lambda self: __get_v__(self, "Scale Axis", default=default_xyz_enum),
+        # set=lambda self, value: __set_v__(self, "Scale Axis", value),
         **axis_enum_property
     )
 
@@ -119,16 +124,9 @@ class OperatorProperty:
         description='Align To Ground Object')
 
     # 每个一个轴的对齐方式
-    x_align_func: EnumProperty(name='X', items=ENUM_ALIGN_FUNC,
-                               default='CENTER', )
-    y_align_func: EnumProperty(name='Y', items=ENUM_ALIGN_FUNC,
-                               default='CENTER', )
-    z_align_func: EnumProperty(name='Z', items=ENUM_ALIGN_FUNC,
-                               default='CENTER', )
-
-    @property
-    def is_fixed_mode(self):
-        return self.distribution_mode == "FIXED"
+    align_x_method: EnumProperty(name='X', **align_method_enum_property)
+    align_y_method: EnumProperty(name='Y', **align_method_enum_property)
+    align_z_method: EnumProperty(name='Z', **align_method_enum_property)
 
     @property
     def is_adjustment_mode(self):
@@ -145,14 +143,6 @@ class OperatorProperty:
     @property
     def is_ground_mode(self):
         return self.align_mode == "GROUND"
-
-    @property
-    def is_distribution_fixed_mode(self):  # 是分布模式并且是固定间距模式
-        return self.is_fixed_mode and self.is_distribution_mode
-
-    @property
-    def is_distribution_adjustment_mode(self):  # 是分布模式并且是固定间距模式
-        return self.is_distribution_mode and self.is_adjustment_mode
 
     @property
     def is_align_to_ground_object(self) -> bool:

@@ -4,18 +4,6 @@ from mathutils import Vector, Matrix
 https://machin3.io/
 """
 
-def get_loc_matrix(location):
-    return Matrix.Translation(location)
-
-def get_rot_matrix(rotation):
-    return rotation.to_matrix().to_4x4()
-
-def get_sca_matrix(scale):
-    scale_mx = Matrix()
-    for i in range(3):
-        scale_mx[i][i] = scale[i]
-    return scale_mx
-
 def compensate_children(obj, oldmx, newmx):
     deltamx = newmx.inverted_safe() @ oldmx
     children = [c for c in obj.children]
@@ -58,3 +46,10 @@ class ToActive:
             compensate_children(obj, omx, loc @ rot @ sca)
 
         obj.matrix_world = loc @ rot @ sca
+
+    # from mathutils import Matrix
+    #
+    # class ToOriginal:
+    #     def align_to_original(self, context):
+    #         from .to_matrix import to_matrix
+    #         to_matrix(self, [sel for sel in context.selected_objects if sel != context.active_object], Matrix())

@@ -1,16 +1,11 @@
 import bpy
-import numpy as np
 from bpy.types import Operator
-from mathutils import Vector
+from mathutils import Matrix
 
-from .align.location_get import LocationGet
-from .align.location_set import LocationSet
 from .align.operator_property import OperatorProperty
-from .align.temp_property import TempProperty
-from .align.to_active import ToActive
+
 
 class UI:
-    # draw UI
     def draw_align_location(self, layout):
         row = layout.row()
         row.prop(self, 'align_location')
@@ -23,7 +18,7 @@ class UI:
         row.prop(self, 'align_rotation')
         row = row.row()
         row.active = self.align_rotation
-        row.prop(self, 'align_rotation_euler_axis')
+        row.prop(self, 'align_rotation_axis')
 
         row = layout.row()
         row.prop(self, 'align_scale')
@@ -69,17 +64,17 @@ class UI:
         row = col.row()
         row.label(text='X')
         row.active = ('X' in self.align_location_axis)
-        row.prop(self, 'x_align_func', expand=True)
+        row.prop(self, 'align_x_method', expand=True)
 
         row = col.row()
         row.label(text='Y')
         row.active = ('Y' in self.align_location_axis)
-        row.prop(self, 'y_align_func', expand=True)
+        row.prop(self, 'align_y_method', expand=True)
 
         row = col.row()
         row.label(text='Z')
         row.active = ('Z' in self.align_location_axis)
-        row.prop(self, 'z_align_func', expand=True)
+        row.prop(self, 'align_z_method', expand=True)
 
         layout.separator()
         self.draw_align_location(layout)
@@ -87,18 +82,14 @@ class UI:
 
 class AlignObject(
     Operator,
-    LocationGet,
-    LocationSet,
     OperatorProperty,
-    TempProperty,
-    ToActive,
     UI
 ):
     """
     对齐物体
-    Ctrl    对齐旋转
-    Shift   对齐缩放
-    Alt     对齐位置
+    # Ctrl    对齐旋转
+    # Shift   对齐缩放
+    # Alt     对齐位置
     可组合按
     """
 
@@ -118,23 +109,17 @@ class AlignObject(
             run_func(col)
         col.column().prop(self, 'align_mode', expand=True)
 
+    def cancel(self, context):
+        print("calcel")
+
     def invoke(self, context, event):
-        self.data = {'DATA': {'CO_TUPLE': [],
-                              'DIMENSIONS': Vector()},
-                     'CENTER': {}
-                     }
-        self.invoke_init_object_location(bpy.context)
-
-        self.min_co = np.min(self.data['DATA']['CO_TUPLE'], axis=0)
-        self.max_co = np.max(self.data['DATA']['CO_TUPLE'], axis=0)
-
-        self.objs_max_min_co = self.max_co - self.min_co  # 所有所选物体的最大最小坐标
-        self.objs_center_co = (self.min_co + self.max_co) / 2
-
-        if event.ctrl or event.shift or event.alt:
-            self.align_rotation = event.ctrl
-            self.align_scale = event.shift
-            self.align_location = event.alt
+        print("invoke")
+        if event.ctrl:
+            self.align_rotation = True
+        if event.shift:
+            self.align_scale = True
+        if event.alt:
+            self.align_location = True
         return self.execute(context)
 
     def execute(self, context):
@@ -145,8 +130,20 @@ class AlignObject(
             中心点
             物体尺寸
         """
-        self.object_location_set_funcs(context)
+        print("Execute")
+        run_func = getattr(self, f'align_to_{self.align_mode.lower()}', None)
+        if run_func:
+            run_func(context)
+        # if self.align_mode == ""
         return {'FINISHED'}
+
+    def align_to_original(self, context):
+        from .align.to_matrix import get_matrix
+
+        for obj in context.selected_objects:
+            mat = get_matrix(self, obj.matrix_world, Matrix())
+            print(obj.name, obj.matrix_world, mat)
+            obj.location = mat.to_translation()
 
 
 class_tuples = (

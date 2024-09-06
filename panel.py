@@ -23,7 +23,7 @@ def set_axis(layout, axis, icon, center=False):
         value = 'MIN' if len(i) >= 2 else 'MAX'
         if center:
             value = 'CENTER'
-        setattr(op, i[-1].lower() + '_align_func', value)
+        setattr(op, f'align_{i[-1].lower()}_method', value)
 
     op.align_location_axis = {i[-1] for i in axis}
     op.align_location = True
@@ -45,7 +45,7 @@ def get_center_align(layout, icon):
     operator.align_mode = 'ALIGN'
     operator.align_location = True
     for i in AXIS:
-        setattr(operator, i.lower() + '_align_func', 'CENTER')
+        setattr(operator, f'align_{i.lower()}_method', 'CENTER')
     return operator
 
 
