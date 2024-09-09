@@ -3,6 +3,8 @@ from bpy.types import Operator
 from mathutils import Matrix
 
 from .align.operator_property import OperatorProperty
+from .align.to_distribution import ToDistribution
+from .align.to_ground import ToGround
 from .align.to_matrix import get_matrix
 
 
@@ -46,18 +48,30 @@ class UI:
         layout.row().prop(self, "distribution_mode", expand=True)
 
     def draw_ground(self, layout: bpy.types.UILayout):
-        col = layout.column()
+        col = layout.column(align=True)
+        pm = self.ground_plane_mode
 
-        col.row().prop(self, 'ground_down_mode', expand=True)
-        col.prop(self, 'align_to_ground_object')# TODO ground object
-        col.prop_search(self, 'ground_object_name', bpy.data, 'objects')
+        if pm != "RAY_CASTING":
+            col.label(text="Down Mode")
+            col.row().prop(self, 'ground_down_mode', expand=True)
+        else:
+            col.prop(self, "ground_ray_casting_rotation")
+
+        col.separator()
+        if self.ground_plane_mode == "DESIGNATED_OBJECT":
+            c = col.column(align=True)
+            c.alert = bool(getattr(bpy.data.objects,"ground_object_name",False))
+            c.prop_search(self, 'ground_object_name', bpy.context.scene, 'objects')
+
+        col.label(text="Ground Plane Mode")
+        col.prop(self, 'ground_plane_mode', expand=True)
         col.separator(factor=2)
 
-        row = col.row()
-        row.prop(self, 'align_location')
-        row = row.row()
-        row.active = self.align_location
-        row.prop(self, 'align_location_axis', expand=True)
+        # row = col.row()
+        # row.prop(self, 'align_location')
+        # row = row.row()
+        # row.active = self.align_location
+        # row.prop(self, 'align_location_axis', expand=True)
 
     def draw_align(self, layout: bpy.types.UILayout):
         col = layout.column()
@@ -84,6 +98,8 @@ class UI:
 class AlignObject(
     Operator,
     OperatorProperty,
+    ToGround,
+    ToDistribution,
     UI
 ):
     """
@@ -158,12 +174,6 @@ class AlignObject(
             context.view_layer.update()
             obj.matrix_world = mat
             context.view_layer.update()
-
-    def align_to_ground(self, context):
-        ...
-
-    def align_to_distribution(self, context):
-        ...
 
     def align_to_align(self, context):
         ...

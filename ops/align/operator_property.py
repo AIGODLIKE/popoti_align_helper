@@ -17,14 +17,16 @@ def __set_v__(self, key, value):
 ENUM_DISTRIBUTION_SORTED_AXIS = [
     ('0', 'X', 'Sort distribution by X axis'),
     ('1', 'Y', 'Sort distribution by Y axis'),
-    ('2', 'Z', 'Sort distribution by X axis'), ]
-ENUM_GROUND_DOWN_MODE = [('ALL', 'All Object', ''),
-                         ('MINIMUM', 'Lowest Object', ''),
-                         ]
+    ('2', 'Z', 'Sort distribution by X axis'),
+]
+ENUM_GROUND_DOWN_MODE = [
+    ('ALL', 'All Object', ''),
+    ('MINIMUM', 'Lowest Object', ''),
+]
 ENUM_GROUND_PLANE_MODE = [
     ('GROUND', 'Ground', 'Align To Ground'),
+    ('DESIGNATED_OBJECT', 'Object', 'Align to Designated Object Z'),
     ('RAY_CASTING', 'Ray Casting', 'Align To Z Ray Casting Object'),
-    ('DESIGNATED_OBJECT', 'Designated Object', 'Align to Designated Object Z'),
 ]
 ENUM_ALIGN_MODE = [
     ('ORIGINAL', 'World Original',
@@ -40,13 +42,14 @@ ENUM_ALIGN_MODE = [
 ]
 ENUM_DISTRIBUTION_MODE = [
     ("FIXED", "Fixed", "Fixed the nearest and farthest objects"),
-    ("ADJUSTMENT", "Adjustment",
-     "Adjust the distance between each object(Fixed active object)"), ]
+    ("ADJUSTMENT", "Adjustment", "Adjust the distance between each object(Fixed active object)"),
+]
 
-ENUM_AXIS = [('X', 'X', 'Align X Axis'),
-             ('Y', 'Y', 'Align Y Axis'),
-             ('Z', 'Z', 'Align Z Axis'),
-             ]
+ENUM_AXIS = [
+    ('X', 'X', 'Align X Axis'),
+    ('Y', 'Y', 'Align Y Axis'),
+    ('Z', 'Z', 'Align Z Axis'),
+]
 
 VALID_OBJ_TYPE = ('FONT', 'OBJECT', 'META', 'SURFACE',
                   'CURVES', 'LATTICE', 'POINTCLOUD', 'GPENCIL', 'ARMATURE')
@@ -122,13 +125,12 @@ class OperatorProperty:
                     'position',
         items=ENUM_DISTRIBUTION_SORTED_AXIS)
 
-    ground_down_mode: EnumProperty(items=ENUM_GROUND_DOWN_MODE)
-    ground_plane_mode: EnumProperty(items=ENUM_GROUND_PLANE_MODE)
-
-    align_to_ground_object: BoolProperty(name='Align To Ground Object')
+    ground_down_mode: EnumProperty(items=ENUM_GROUND_DOWN_MODE, name="Down Mode")
+    ground_plane_mode: EnumProperty(items=ENUM_GROUND_PLANE_MODE, name="Ground Plane Mode")
     ground_object_name: StringProperty(
         name='To Object',
         description='Align To Ground Object')
+    ground_ray_casting_rotation: BoolProperty(name="Ray Casting Rotation")
 
     # 每个一个轴的对齐方式
     align_x_method: EnumProperty(name='X', **align_method_enum_property)
