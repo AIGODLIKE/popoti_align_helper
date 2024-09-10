@@ -38,11 +38,16 @@ class UI:
         self.draw_original(layout)
 
     def draw_distribution(self, layout: bpy.types.UILayout):
-        row = layout.row()
+        col = layout.column(align=True)
+        row = col.row()
         row.label(text='Sort Axis')
         row.prop(self, 'distribution_sorted_axis', expand=True)
         layout.separator()
-        self.draw_align_location(layout)
+
+        row = col.row()
+        row.label(text='Location')
+        row.prop(self, 'align_location_axis')
+
         if self.is_adjustment_mode:
             layout.prop(self, "distribution_adjustment_value")
         layout.row().prop(self, "distribution_mode", expand=True)
@@ -60,7 +65,7 @@ class UI:
         col.separator()
         if self.ground_plane_mode == "DESIGNATED_OBJECT":
             c = col.column(align=True)
-            c.alert = bool(getattr(bpy.data.objects,"ground_object_name",False))
+            c.alert = bool(getattr(bpy.data.objects, "ground_object_name", False))
             c.prop_search(self, 'ground_object_name', bpy.context.scene, 'objects')
 
         col.label(text="Ground Plane Mode")
