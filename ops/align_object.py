@@ -182,10 +182,6 @@ class AlignObject(
             obj.matrix_world = mat
             context.view_layer.update()
 
-    def align_to_align(self, context):
-        ...
-
-
 class_tuples = (
     AlignObject,
 )
