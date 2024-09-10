@@ -8,7 +8,7 @@ from .to_matrix import get_rot_matrix, get_loc_matrix, get_sca_matrix
 class ToDistribution:
 
     def align_to_distribution(self, context):
-        dep = bpy.context.evaluated_depsgraph_get()
+        dep = context.evaluated_depsgraph_get()
         dep_objs = [obj.evaluated_get(dep) for obj in context.selected_objects]
         measures = MeasureObjects(dep_objs)
 

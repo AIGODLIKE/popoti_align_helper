@@ -3,6 +3,7 @@ from bpy.types import Operator
 from mathutils import Matrix
 
 from .align.operator_property import OperatorProperty
+from .align.to_align import ToAlign
 from .align.to_distribution import ToDistribution
 from .align.to_ground import ToGround
 from .align.to_matrix import get_matrix
@@ -105,6 +106,7 @@ class AlignObject(
     OperatorProperty,
     ToGround,
     ToDistribution,
+    ToAlign,
     UI
 ):
     """
