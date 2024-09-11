@@ -11,7 +11,8 @@ def __get_v__(self, key, default):
 
 
 def __set_v__(self, key, value):
-    self[f"{self.align_mode}_{key}"] = value
+    k = f"{self.align_mode}_{key}"
+    self[k] = value
 
 
 ENUM_DISTRIBUTION_SORTED_AXIS = [
@@ -26,7 +27,7 @@ ENUM_GROUND_DOWN_MODE = [
 ENUM_GROUND_PLANE_MODE = [
     ('GROUND', 'Ground', 'Align To Ground'),
     ('DESIGNATED_OBJECT', 'Object', 'Align to Designated Object Z'),
-    ('RAY_CASTING', 'Ray Casting', 'Align To Z Ray Casting Object'),
+    ('RAY_CASTING', 'Fall', 'Align To Z Ray Casting Object'),
 ]
 ENUM_ALIGN_MODE = [
     ('ORIGINAL', 'World Original',
@@ -58,7 +59,7 @@ axis_enum_property = dict(
     name='Axis to be aligned',
     description='Select the axis to be aligned, multiple choices are allowed',
     items=ENUM_AXIS,
-    options={'ENUM_FLAG'})
+    options={'ENUM_FLAG', "SKIP_SAVE"})
 
 align_method_enum_property = dict(
     items=[
@@ -96,15 +97,15 @@ class OperatorProperty:
         set=lambda self, value: __set_v__(self, "Scale", value))
 
     def __get_lx__(self):
-        key = f"{self.align_mode}_Location Axis"
+        key = f"{self.align_mode}_align_location_axis"
         if self.align_mode == "GROUND" and key not in self:
             # 地面默认只开Z
             return 4
-        return __get_v__(self, "Location Axis", default=default_xyz_enum)
+        return __get_v__(self, "align_location_axis", default=default_xyz_enum)
 
     align_location_axis: EnumProperty(
         get=__get_lx__,
-        set=lambda self, value: __set_v__(self, "Location Axis", value),
+        set=lambda self, value: __set_v__(self, "align_location_axis", value),
         **axis_enum_property
     )
     align_rotation_axis: EnumProperty(
@@ -130,7 +131,7 @@ class OperatorProperty:
     ground_object_name: StringProperty(
         name='To Object',
         description='Align To Ground Object')
-    ground_ray_casting_rotation: BoolProperty(name="Ray Casting Rotation")
+    ground_ray_casting_rotation: BoolProperty(name="Ray Casting Rotation", default=True)
 
     # 每个一个轴的对齐方式
     align_x_method: EnumProperty(name='X', **align_method_enum_property)

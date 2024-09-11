@@ -98,7 +98,7 @@ class UI:
         row.prop(self, 'align_z_method', expand=True)
 
         layout.separator()
-        self.draw_align_location(layout)
+        layout.row().prop(self, 'align_location_axis')
 
 
 class AlignObject(
@@ -133,17 +133,22 @@ class AlignObject(
             run_func(col)
         col.column().prop(self, 'align_mode', expand=True)
 
-    def cancel(self, context):
-        print("calcel")
 
     def invoke(self, context, event):
-        print("invoke")
         if event.ctrl:
             self.align_rotation = True
         if event.shift:
             self.align_scale = True
         if event.alt:
             self.align_location = True
+
+        print("invoke")
+        print(
+            self.align_x_method,
+            self.align_y_method,
+            self.align_z_method,
+            self.align_location_axis,
+        )
         return self.execute(context)
 
     def execute(self, context):
@@ -181,6 +186,7 @@ class AlignObject(
             context.view_layer.update()
             obj.matrix_world = mat
             context.view_layer.update()
+
 
 class_tuples = (
     AlignObject,

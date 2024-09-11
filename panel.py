@@ -9,7 +9,8 @@ AXIS = ('X', 'Y', 'Z')
 
 
 def set_axis(layout, axis, icon, center=False):
-    op = layout.operator(
+    row = layout.row()
+    op = row.operator(
         AlignObject.bl_idname,
         icon_value=get_icon(icon),
         text='',
@@ -24,9 +25,11 @@ def set_axis(layout, axis, icon, center=False):
         if center:
             value = 'CENTER'
         setattr(op, f'align_{i[-1].lower()}_method', value)
-
-    op.align_location_axis = {i[-1] for i in axis}
+    a = {i[-1] for i in axis}
+    row.label(text=str(a))
+    op.align_mode = 'ALIGN'
     op.align_location = True
+    op.align_location_axis = a
 
 
 def set_text(text: str):
@@ -131,23 +134,6 @@ def draw_right(layout, context):
     draw_cursor_active_original(col)
 
 
-def draw_left(layout, context):
-    (x, x_), (y, y_) = screen_relevant_direction_3d_axis(context)
-    col = layout.column(align=True)
-    row = col.row(align=True)
-    set_axis(row, {x_, y}, 'Align_Left_Up')
-    set_axis(row, {y}, 'Align_Up')
-    set_axis(row, {x, y}, 'Align_Right_Up')
-    row = col.row(align=True)
-    set_axis(row, {x_}, 'Align_Left')
-    set_axis(row, 'CENTER', 'Align_Center')
-    set_axis(row, {x}, 'Align_Right')
-    row = col.row(align=True)
-    set_axis(row, {x_, y_}, 'Align_Left_Down')
-    set_axis(row, {y_}, 'Align_Down')
-    set_axis(row, {x, y_}, 'Align_Right_Down')
-
-
 class ObjectAlignPanel(Panel):
     bl_idname = 'ALIGN_PT_Panel'
     bl_label = 'POPOTI Align Helper'
@@ -157,23 +143,14 @@ class ObjectAlignPanel(Panel):
     bl_category = "Tool"
 
     def draw(self, context):
-        layout = self.layout
-        if context.region.width > 700:
-            sp = layout.split(factor=0.4, align=True)
-            a = sp.row(align=True)
-            b = sp.row(align=True)
-            b.scale_y = a.scale_x = a.scale_y = 1.5
-
-            from .preferences import Preferences
-            pref = Preferences.pref_()
-            if not pref.show_text:
-                b.scale_x = 2
-        else:
-            a = layout.column(align=True)
-            b = layout.column(align=True)
+        column = self.layout.column(align=True)
+        a = column.column(align=True)
+        column.separator()
+        b = column.column(align=True)
 
         if getattr(context.space_data, 'region_3d', False):
-            draw_left(a, context)
+            from .ops import ObjectAlignByView
+            ObjectAlignByView.draw_nine_square_box(a, show_text=True, ops=None)
             draw_right(b, context)
 
 

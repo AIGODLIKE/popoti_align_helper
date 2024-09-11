@@ -9,7 +9,6 @@ class ToAlign:
         dep = context.evaluated_depsgraph_get()
         dep_objs = [obj.evaluated_get(dep) for obj in context.selected_objects]
         measures = MeasureObjects(dep_objs)
-
         to_loc = self.__mix_loc__([measures.min, measures.center, measures.max])
         for m in measures:
             obj = m.__object__
@@ -24,7 +23,7 @@ class ToAlign:
             context.view_layer.update()
             context.scene.objects[m.name].matrix_world = loc @ rot @ sca
             context.view_layer.update()
-            
+
     def __mix_loc__(self, matrix_items):
         items = ["MIN", "CENTER", "MAX", ]
         x = items.index(self.align_x_method)

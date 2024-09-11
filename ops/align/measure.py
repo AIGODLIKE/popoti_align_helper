@@ -82,12 +82,7 @@ class MeasureObjects:
 
         for m in self.__measures__:
             self.__points__.extend([m.min, m.max])
-
-        print("MeasureObjects")
-        print(self.max)
-        print(self.center)
-        print(self.min)
-
+            
     def __iter__(self):
         return iter(self.__measures__)
 
