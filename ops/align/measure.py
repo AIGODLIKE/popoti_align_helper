@@ -126,19 +126,3 @@ class MeasureObjects:
         ('X', 'Y', 'Z')
         """
         return sorted(self.__measures__, key=lambda k: k.center[axis])
-
-    def align_mode_loc(self, ops: bpy.types.Operator) -> Vector:
-        items = [
-            "MIN",
-            "CENTER",
-            "MAX",
-        ]
-        x = items.index(ops.align_x_method)
-        y = items.index(ops.align_y_method)
-        z = items.index(ops.align_z_method)
-        ll = [self.min, self.center, self.max]
-        return Vector((
-            ll[x].x,
-            ll[y].y,
-            ll[z].z
-        ))
