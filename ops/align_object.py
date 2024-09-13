@@ -73,11 +73,6 @@ class UI:
         col.prop(self, 'ground_plane_mode', expand=True)
         col.separator(factor=2)
 
-        # row = col.row()
-        # row.prop(self, 'align_location')
-        # row = row.row()
-        # row.active = self.align_location
-        # row.prop(self, 'align_location_axis', expand=True)
 
     def draw_align(self, layout: bpy.types.UILayout):
         col = layout.column()
