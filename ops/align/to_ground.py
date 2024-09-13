@@ -6,19 +6,14 @@ from .to_matrix import get_loc_matrix, get_rot_matrix, get_sca_matrix
 
 class ToGround:
     def align_to_ground(self, context):
-        print("align_to_ground")
-        print(
-            self.ground_down_mode,
-            self.ground_plane_mode,
-            self.ground_object_name,
-        )
         dep = context.evaluated_depsgraph_get()
         if self.ground_plane_mode == "RAY_CASTING":
             self.align_to_ground_ray_casting(context, dep)
         else:
             matrix = Matrix()
-
             if self.ground_plane_mode == "DESIGNATED_OBJECT":
+                if not self.ground_object_name:
+                    return
                 if self.ground_object_name not in context.scene.objects:
                     return
                 obj = context.scene.objects[self.ground_object_name]
@@ -26,7 +21,6 @@ class ToGround:
                 matrix = obj.matrix_world @ Matrix.Translation(mp)
             to_z = matrix.translation.z  # 只使用z轴数据
             # 计算每一个物体到0的偏移并移动
-            print(to_z)
             min_z = None
             for obj in context.selected_objects:
                 z = get_bound_box_count_point(obj.evaluated_get(dep)).z + obj.location.z  # 需工偏移的位置

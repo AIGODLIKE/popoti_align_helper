@@ -49,7 +49,7 @@ class UI:
         row.label(text='Location')
         row.prop(self, 'align_location_axis')
 
-        if self.is_adjustment_mode:
+        if self.distribution_mode == "ADJUSTMENT":
             layout.prop(self, "distribution_adjustment_value")
         layout.row().prop(self, "distribution_mode", expand=True)
 
@@ -142,14 +142,6 @@ class AlignObject(
             self.align_scale = True
         if event.alt:
             self.align_location = True
-
-        print("invoke")
-        print(
-            self.align_x_method,
-            self.align_y_method,
-            self.align_z_method,
-            self.align_location_axis,
-        )
         return self.execute(context)
 
     def execute(self, context):

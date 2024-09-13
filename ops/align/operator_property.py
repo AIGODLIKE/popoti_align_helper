@@ -137,30 +137,3 @@ class OperatorProperty:
     align_x_method: EnumProperty(name='X', **align_method_enum_property)
     align_y_method: EnumProperty(name='Y', **align_method_enum_property)
     align_z_method: EnumProperty(name='Z', **align_method_enum_property)
-
-    @property
-    def is_adjustment_mode(self):
-        return self.distribution_mode == "ADJUSTMENT"
-
-    @property
-    def is_distribution_mode(self):
-        return self.align_mode == "DISTRIBUTION"
-
-    @property
-    def is_align_mode(self):
-        return self.align_mode == "ALIGN"
-
-    @property
-    def is_ground_mode(self):
-        return self.align_mode == "GROUND"
-
-    @property
-    def is_align_to_ground_object(self) -> bool:
-        ground = self.ground_object and self.is_ground_mode
-        return self.align_to_ground_object and ground
-
-    @property
-    def ground_object(self) -> bpy.types.Object:
-        name = self.ground_object_name
-        if name:
-            return bpy.data.objects.get(name, None)
