@@ -91,6 +91,18 @@ def draw_ground(layout):
                          icon='IMPORT')
     op.align_mode = 'GROUND'
     op.ground_down_mode = 'ALL'
+    op.ground_plane_mode = 'GROUND'
+    op.align_location_axis = {'Z'}
+    op.align_location = True
+
+
+def draw_fall(layout):
+    op = layout.operator(AlignObject.bl_idname,
+                         text=set_text('Fall'),
+                         icon='AXIS_TOP')
+    op.align_mode = 'GROUND'
+    op.ground_down_mode = 'ALL'
+    op.ground_plane_mode = 'RAY_CASTING'
     op.align_location_axis = {'Z'}
     op.align_location = True
 
@@ -119,10 +131,10 @@ def draw_cursor_active_original(layout):
 def draw_right(layout, context):
     direction = screen_relevant_direction_3d_axis(context)
     row = layout.row(align=True)
-    col = row.column(align=True)
+    column = row.column(align=True)
 
-    col.scale_y = col.scale_x = 1.51495
-    draw_center_align(col, direction)
+    column.scale_y = column.scale_x = 1.51495
+    draw_center_align(column, direction)
 
     # three 分布 地面
     col = row.column(align=True)
@@ -132,6 +144,7 @@ def draw_right(layout, context):
     # original cursor active original
     col = row.column(align=True)
     draw_cursor_active_original(col)
+    draw_fall(layout)
 
 
 class ObjectAlignPanel(Panel):
@@ -167,7 +180,7 @@ class ObjectAlignPanel(Panel):
         if getattr(context.space_data, 'region_3d', False):
             from .ops import ObjectAlignByView
             from .utils import get_pref
-            ObjectAlignByView.draw_nine_square_box(a, show_text=show_text, ops=None)
+            ObjectAlignByView.draw_nine_square_box(a, show_text=False, ops=None)
             draw_right(b, context)
 
 
