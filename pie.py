@@ -33,9 +33,8 @@ class AlignPieMenu(Menu):
         draw_distribution_x(pie, x)
 
         col = pie.column(align=True)
-        col.scale_y = 1.3
-        draw_ground(col)
         draw_fall(col)
+        draw_ground(col)
         draw_cursor_active_original(col)
 
 

@@ -108,12 +108,20 @@ def draw_fall(layout):
 
 
 def draw_cursor_active_original(layout):
+    draw_world(layout)
+    draw_active(layout)
+    draw_cursor(layout)
+
+
+def draw_world(layout):
     op = layout.operator(AlignObject.bl_idname,
                          text=set_text('World Original'),
                          icon='OBJECT_ORIGIN')
     op.align_mode = 'ORIGINAL'
     op.align_location = True
 
+
+def draw_active(layout):
     op = layout.operator(AlignObject.bl_idname,
                          text=set_text('Active'),
                          icon='RESTRICT_SELECT_OFF')
@@ -121,6 +129,8 @@ def draw_cursor_active_original(layout):
     op.align_mode = 'ACTIVE'
     op.align_location = True
 
+
+def draw_cursor(layout):
     op = layout.operator(AlignObject.bl_idname,
                          text=set_text('Cursor'),
                          icon='PIVOT_CURSOR')
@@ -144,7 +154,6 @@ def draw_right(layout, context):
     # original cursor active original
     col = row.column(align=True)
     draw_cursor_active_original(col)
-    draw_fall(layout)
 
 
 class ObjectAlignPanel(Panel):
@@ -160,28 +169,14 @@ class ObjectAlignPanel(Panel):
         return context.mode == "OBJECT"
 
     def draw(self, context):
-        from .utils import get_pref
-
-        show_text = get_pref().show_text
-        if not show_text:
-            sp = self.layout.split(factor=0.4, align=True)
-            a = sp.row(align=True)
-            b = sp.row(align=True)
-            b.scale_y = a.scale_x = a.scale_y = 1.5
-
-            if not get_pref().show_text:
-                b.scale_x = 2
-        else:
-            column = self.layout.column(align=True)
-            a = column.column(align=True)
-            column.separator()
-            b = column.column(align=True)
-
+        col = self.layout.column(align=True)
+        row = col.row(align=True)
         if getattr(context.space_data, 'region_3d', False):
             from .ops import ObjectAlignByView
             from .utils import get_pref
-            ObjectAlignByView.draw_nine_square_box(a, show_text=False, ops=None)
-            draw_right(b, context)
+            ObjectAlignByView.draw_nine_square_box(row, show_text=False, ops=None)
+            draw_right(row, context)
+            draw_fall(col)
 
 
 class_tuples = (
