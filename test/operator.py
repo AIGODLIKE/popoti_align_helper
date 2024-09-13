@@ -59,19 +59,19 @@ class OperatorTestCase(unittest.TestCase):
                     align_rotation=e,
                     align_scale=f,
                     align_location_axis=g,
-                    align_rotation_euler_axis=h,
+                    align_rotation_axis=h,
                     align_scale_axis=i,
                     distribution_sorted_axis=j,
                     ground_mode=k,
-                    x_align_func=i,
-                    y_align_func=m,
-                    z_align_func=s,
+                    align_x_method=i,
+                    align_y_method=m,
+                    align_z_method=s,
                 ),
                 {"FINISHED"}
             )
 
     def test_property(self):
-        from ..preferences import Preferences
-        pref = Preferences.pref_()
+        from ..utils import get_pref
+        pref = get_pref()
         pref.show_text = True
         self.assertEqual(pref.show_text, True)

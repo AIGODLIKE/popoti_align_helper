@@ -1,7 +1,7 @@
-import bpy
-
-import os
 import json
+import os
+
+import bpy
 
 
 class TranslationHelper:
@@ -18,8 +18,8 @@ class TranslationHelper:
     def register(self):
         try:
             bpy.app.translations.register(self.name, self.translations_dict)
-        except ValueError as v:
-            print(v.args)
+        except ValueError as e:
+            print(e.args)
 
     def unregister(self):
         bpy.app.translations.unregister(self.name)

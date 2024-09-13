@@ -38,5 +38,10 @@
   "Adjust the distance between each object(Fixed active object)": "调整每个对象之间的距离(固定活动对象位置)",
   "Show Button Text": "显示按钮文字",
   "Align To Ground Object": "对齐到地面物体",
-  "To Object": "到物体"
+  "To Object": "到物体",
+  "Left Up": "左上",
+  "Up": "上",
+  "Right Up": "右上",
+  "Center": "中心",
+  "Object Align by View": "按视图对齐物体"
 }

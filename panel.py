@@ -9,7 +9,8 @@ AXIS = ('X', 'Y', 'Z')
 
 
 def set_axis(layout, axis, icon, center=False):
-    op = layout.operator(
+    row = layout.row()
+    op = row.operator(
         AlignObject.bl_idname,
         icon_value=get_icon(icon),
         text='',
@@ -23,15 +24,17 @@ def set_axis(layout, axis, icon, center=False):
         value = 'MIN' if len(i) >= 2 else 'MAX'
         if center:
             value = 'CENTER'
-        setattr(op, i[-1].lower() + '_align_func', value)
-
-    op.align_location_axis = {i[-1] for i in axis}
+        setattr(op, f'align_{i[-1].lower()}_method', value)
+    a = {i[-1] for i in axis}
+    row.label(text=str(a))
+    op.align_mode = 'ALIGN'
     op.align_location = True
+    op.align_location_axis = a
 
 
 def set_text(text: str):
-    from .preferences import Preferences
-    pref = Preferences.pref_()
+    from .utils import get_pref
+    pref = get_pref()
     if pref.show_text:
         return text
     return ""
@@ -45,7 +48,7 @@ def get_center_align(layout, icon):
     operator.align_mode = 'ALIGN'
     operator.align_location = True
     for i in AXIS:
-        setattr(operator, i.lower() + '_align_func', 'CENTER')
+        setattr(operator, f'align_{i.lower()}_method', 'CENTER')
     return operator
 
 
@@ -87,7 +90,7 @@ def draw_ground(layout):
                          text=set_text('Ground'),
                          icon='IMPORT')
     op.align_mode = 'GROUND'
-    op.ground_mode = 'ALL'
+    op.ground_down_mode = 'ALL'
     op.align_location_axis = {'Z'}
     op.align_location = True
 
@@ -131,23 +134,6 @@ def draw_right(layout, context):
     draw_cursor_active_original(col)
 
 
-def draw_left(layout, context):
-    (x, x_), (y, y_) = screen_relevant_direction_3d_axis(context)
-    col = layout.column(align=True)
-    row = col.row(align=True)
-    set_axis(row, {x_, y}, 'Align_Left_Up')
-    set_axis(row, {y}, 'Align_Up')
-    set_axis(row, {x, y}, 'Align_Right_Up')
-    row = col.row(align=True)
-    set_axis(row, {x_}, 'Align_Left')
-    set_axis(row, 'CENTER', 'Align_Center')
-    set_axis(row, {x}, 'Align_Right')
-    row = col.row(align=True)
-    set_axis(row, {x_, y_}, 'Align_Left_Down')
-    set_axis(row, {y_}, 'Align_Down')
-    set_axis(row, {x, y_}, 'Align_Right_Down')
-
-
 class ObjectAlignPanel(Panel):
     bl_idname = 'ALIGN_PT_Panel'
     bl_label = 'POPOTI Align Helper'
@@ -156,24 +142,32 @@ class ObjectAlignPanel(Panel):
     bl_region_type = 'UI'
     bl_category = "Tool"
 
+    @classmethod
+    def poll(cls, context):
+        return context.mode == "OBJECT"
+
     def draw(self, context):
-        layout = self.layout
-        if context.region.width > 700:
-            sp = layout.split(factor=0.4, align=True)
+        from .utils import get_pref
+
+        show_text = get_pref().show_text
+        if not show_text:
+            sp = self.layout.split(factor=0.4, align=True)
             a = sp.row(align=True)
             b = sp.row(align=True)
             b.scale_y = a.scale_x = a.scale_y = 1.5
 
-            from .preferences import Preferences
-            pref = Preferences.pref_()
-            if not pref.show_text:
+            if not get_pref().show_text:
                 b.scale_x = 2
         else:
-            a = layout.column(align=True)
-            b = layout.column(align=True)
+            column = self.layout.column(align=True)
+            a = column.column(align=True)
+            column.separator()
+            b = column.column(align=True)
 
         if getattr(context.space_data, 'region_3d', False):
-            draw_left(a, context)
+            from .ops import ObjectAlignByView
+            from .utils import get_pref
+            ObjectAlignByView.draw_nine_square_box(a, show_text=show_text, ops=None)
             draw_right(b, context)
 
 

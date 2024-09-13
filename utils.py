@@ -1,4 +1,4 @@
-from time import time as _time
+from time import time
 
 import bpy
 import numpy as _np
@@ -40,7 +40,7 @@ def vertices_co(data, *, matrix=None, debug=False):
         numpy.array: 反回所有顶点坐标的np阵列
     """
 
-    st = _time()
+    st = time()
     try:
         data = _get_mesh(data)
         vertices = data.vertices
@@ -57,7 +57,7 @@ def vertices_co(data, *, matrix=None, debug=False):
         if matrix:
             np_co = np_matrix_dot(np_co, matrix)
         if debug:
-            print(f'获取{data}顶点数据,共用时{_time() - st}s')
+            print(f'获取{data}顶点数据,共用时{time() - st}s')
         return np_co
 
 
@@ -129,3 +129,8 @@ def screen_relevant_direction_3d_axis(context, *, return_type=None):
         return data
 
     return data['x']['axis'], data['y']['axis']
+
+
+def get_pref():
+    """获取偏好"""
+    return bpy.context.preferences.addons[__package__].preferences

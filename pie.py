@@ -1,7 +1,8 @@
 import bpy
 from bpy.types import Menu
 
-from .panel import (set_axis, draw_ground,
+from .ops import ObjectAlignByView as view
+from .panel import (draw_ground,
                     draw_cursor_active_original,
                     draw_distribution_y, draw_distribution_x,
                     draw_center_align)
@@ -14,15 +15,15 @@ class AlignPieMenu(Menu):
 
     def draw(self, context):
         layout = self.layout
-
+        item = view._item_
         pie = layout.menu_pie()
+        item(pie, 'Align_Left', False, ops=False)
+        item(pie, 'Align_Right', False, ops=False)
+        item(pie, 'Align_Down', False, ops=False)
+        item(pie, 'Align_Up', False, ops=False)
+
         direction = screen_relevant_direction_3d_axis(context)
         (x, x_), (y, y_) = direction
-        set_axis(pie, {x_}, 'Align_Left')
-        set_axis(pie, {x}, 'Align_Right')
-        set_axis(pie, {y_}, 'Align_Down')
-        set_axis(pie, {y}, 'Align_Up')
-
         draw_distribution_y(pie, y)
 
         col = pie.column(align=True)
