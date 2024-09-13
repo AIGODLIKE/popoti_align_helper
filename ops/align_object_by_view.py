@@ -75,6 +75,7 @@ class ObjectAlignByView(Operator):
             ).align_mode = identifier
 
     def execute(self, context):
+        context.view_layer.update()
         (x, x_), (y, y_) = screen_relevant_direction_3d_axis(context)
         axis_items = {
             'Align_Left_Up': {x_, y},
