@@ -25,6 +25,10 @@ class ObjectAlignByView(Operator):
         ]
     )
 
+    @classmethod
+    def poll(cls, context):
+        return context.selected_objects.__len__()
+
     def draw(self, context):
         ObjectAlignByView.draw_nine_square_box(self.layout, True, self)
 
@@ -55,7 +59,7 @@ class ObjectAlignByView(Operator):
     @staticmethod
     def _item_(layout: bpy.types.Operator, identifier, show_text, ops):
         from ..icons import get_icon
-        text = identifier.replace("Align_", "").replace("_", " ") if show_text else " "
+        text = identifier.replace("Align_", "").replace("_", " ") if show_text else ""
         if ops:
             layout.context_pointer_set("ops", ops)
             o = layout.operator("wm.context_set_enum",

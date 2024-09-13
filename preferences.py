@@ -2,26 +2,18 @@ import bpy
 from bpy.props import BoolProperty
 from bpy.types import AddonPreferences
 
-G_ADDON_NAME = __package__
 
+class AddonProperty(AddonPreferences):
+    bl_idname = __package__
 
-class Preferences:
-    @staticmethod
-    def pref_() -> 'AddonPreferences':
-        bl_idname = AddonProperty.bl_idname
-        return bpy.context.preferences.addons[bl_idname].preferences
+    show_text: BoolProperty(name='Show Button Text', default=True)
+    show_red: BoolProperty()
 
     @property
     def pref(self) -> 'AddonPreferences':
         """反回插件属性"""
-        return Preferences.pref_()
-
-
-class AddonProperty(Preferences, AddonPreferences):
-    bl_idname = G_ADDON_NAME
-
-    show_text: BoolProperty(name='Show Button Text', default=True)
-    show_red: BoolProperty()
+        from .utils import get_pref
+        return get_pref()
 
     def draw(self, context):
         self.layout.prop(self, 'show_text')

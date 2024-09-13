@@ -125,6 +125,7 @@ class AlignObject(
     def poll(cls, context):
         return context.selected_objects.__len__()
 
+
     def draw(self, context):
         layout = self.layout
         col = layout.column()

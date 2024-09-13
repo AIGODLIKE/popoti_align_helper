@@ -129,3 +129,8 @@ def screen_relevant_direction_3d_axis(context, *, return_type=None):
         return data
 
     return data['x']['axis'], data['y']['axis']
+
+
+def get_pref():
+    """获取偏好"""
+    return bpy.context.preferences.addons[__package__].preferences

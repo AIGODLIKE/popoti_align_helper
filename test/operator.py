@@ -71,7 +71,7 @@ class OperatorTestCase(unittest.TestCase):
             )
 
     def test_property(self):
-        from ..preferences import Preferences
-        pref = Preferences.pref_()
+        from ..utils import get_pref
+        pref = get_pref()
         pref.show_text = True
         self.assertEqual(pref.show_text, True)

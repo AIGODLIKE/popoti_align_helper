@@ -33,8 +33,8 @@ def set_axis(layout, axis, icon, center=False):
 
 
 def set_text(text: str):
-    from .preferences import Preferences
-    pref = Preferences.pref_()
+    from .utils import get_pref
+    pref = get_pref()
     if pref.show_text:
         return text
     return ""
@@ -142,15 +142,32 @@ class ObjectAlignPanel(Panel):
     bl_region_type = 'UI'
     bl_category = "Tool"
 
+    @classmethod
+    def poll(cls, context):
+        return context.mode == "OBJECT"
+
     def draw(self, context):
-        column = self.layout.column(align=True)
-        a = column.column(align=True)
-        column.separator()
-        b = column.column(align=True)
+        from .utils import get_pref
+
+        show_text = get_pref().show_text
+        if not show_text:
+            sp = self.layout.split(factor=0.4, align=True)
+            a = sp.row(align=True)
+            b = sp.row(align=True)
+            b.scale_y = a.scale_x = a.scale_y = 1.5
+
+            if not get_pref().show_text:
+                b.scale_x = 2
+        else:
+            column = self.layout.column(align=True)
+            a = column.column(align=True)
+            column.separator()
+            b = column.column(align=True)
 
         if getattr(context.space_data, 'region_3d', False):
             from .ops import ObjectAlignByView
-            ObjectAlignByView.draw_nine_square_box(a, show_text=True, ops=None)
+            from .utils import get_pref
+            ObjectAlignByView.draw_nine_square_box(a, show_text=show_text, ops=None)
             draw_right(b, context)
 
 
