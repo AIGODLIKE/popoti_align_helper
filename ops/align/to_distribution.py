@@ -1,4 +1,3 @@
-import bpy
 from mathutils import Vector
 
 from .measure import MeasureObjects
@@ -11,7 +10,8 @@ class ToDistribution:
         dep = context.evaluated_depsgraph_get()
         dep_objs = [obj.evaluated_get(dep) for obj in context.selected_objects]
         measures = MeasureObjects(dep_objs)
-
+        if len(dep_objs) < 2:
+            return
         offset = measures.min.copy()
         for m in measures.sort_by_axis(int(self.distribution_sorted_axis)):
             obj = m.__object__
