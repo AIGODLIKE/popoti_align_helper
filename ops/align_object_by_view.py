@@ -6,8 +6,8 @@ from ..utils import screen_relevant_direction_3d_axis
 
 
 class ObjectAlignByView(Operator):
-    bl_idname = "object.object_align_by_view"
-    bl_label = "Object Align by View"
+    bl_idname = 'object.object_align_by_view'
+    bl_label = 'Object Align by View'
     bl_options = {'REGISTER', 'UNDO'}
 
     align_mode: EnumProperty(
@@ -59,13 +59,13 @@ class ObjectAlignByView(Operator):
     @staticmethod
     def _item_(layout: bpy.types.Operator, identifier, show_text, ops):
         from ..icons import get_icon
-        text = identifier.replace("Align_", "").replace("_", " ") if show_text else ""
+        text = identifier.replace('Align_', '').replace('_', ' ') if show_text else ''
         if ops:
-            layout.context_pointer_set("ops", ops)
-            o = layout.operator("wm.context_set_enum",
+            layout.context_pointer_set('ops', ops)
+            o = layout.operator('wm.context_set_enum',
                                 icon_value=get_icon(identifier),
                                 text=text)
-            o.data_path = "ops.align_mode"
+            o.data_path = 'ops.align_mode'
             o.value = identifier
         else:
             layout.operator(
@@ -87,7 +87,7 @@ class ObjectAlignByView(Operator):
             'Align_Down': {y_},
             'Align_Right_Down': {x, y_},
 
-            "Align_Center": {'X', 'Y', 'Z'}
+            'Align_Center': {'X', 'Y', 'Z'}
         }
         axis = axis_items[self.align_mode]
         args = dict(
@@ -99,10 +99,10 @@ class ObjectAlignByView(Operator):
             if self.align_mode == 'Align_Center':
                 value = 'CENTER'
             args[f'align_{i[-1].lower()}_method'] = value
-        args["align_location_axis"] = {i[-1] for i in axis}
-        args["align_location"] = True
+        args['align_location_axis'] = {i[-1] for i in axis}
+        args['align_location'] = True
 
         context.view_layer.update()
         bpy.ops.object.tool_kits_fast_align(**args)
         context.view_layer.update()
-        return {"FINISHED"}
+        return {'FINISHED'}
