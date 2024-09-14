@@ -1,8 +1,7 @@
 # POPOTI Align Helper
 
 More friendly alignment based on observation perspective<br>
-<video src="readme/video.mp4" controls></video>
-
+![Video](readme/video.gif)
 ![Preview](readme/preview.png)
 
 - Ctrl Alt A Align Pie Menu
