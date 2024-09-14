@@ -2,6 +2,7 @@ from time import time
 
 import bpy
 import numpy as _np
+import numpy as np
 from mathutils import Vector
 
 

@@ -150,7 +150,9 @@ class AlignObject(
         run_func = getattr(self, f'align_to_{self.align_mode.lower()}', None)
         if run_func:
             context.view_layer.update()
+            context.view_layer.update()
             run_func(context)
+            context.view_layer.update()
             context.view_layer.update()
         return {'FINISHED'}
 

@@ -1,4 +1,3 @@
-import bpy
 from bpy.props import EnumProperty, FloatProperty, BoolProperty, StringProperty
 
 
@@ -53,7 +52,7 @@ ENUM_AXIS = [
 ]
 
 VALID_OBJ_TYPE = ('FONT', 'OBJECT', 'META', 'SURFACE',
-                  'CURVES', 'LATTICE', 'POINTCLOUD', 'GPENCIL', 'ARMATURE')
+                  'CURVES', 'LATTICE', 'POINTCLOUD', 'GPENCIL', 'ARMATURE', 'MESH')
 
 axis_enum_property = dict(
     name='Axis to be aligned',
