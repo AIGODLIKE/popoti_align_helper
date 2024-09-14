@@ -1,7 +1,7 @@
 # POPOTI Align Helper
 
 More friendly alignment based on observation perspective<br>
-<video src="readme/video.mp4" controls></video>
+https://github.com/user-attachments/assets/a58954ab-e369-44b5-bc4f-5efc35154944
 
 ![Preview](readme/preview.png)
 
