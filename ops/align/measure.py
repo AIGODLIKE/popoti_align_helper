@@ -2,7 +2,7 @@ import bpy
 import numpy as np
 from mathutils import Vector
 
-from .to_matrix import get_rot_matrix
+from .to_matrix import get_loc_matrix
 
 
 def np_matrix_dot(np_co, matrix):
@@ -24,8 +24,9 @@ class Measure:
     def __init__(self, obj):
         self.__object__ = obj
 
-        np_co = np_matrix_dot(np.array(obj.bound_box, dtype=np.float32), get_rot_matrix(obj.rotation_euler))
-        self.__bound_box__ = [Vector(i) for i in np_co]
+        from .to_ground import get_count_bound_box
+        lm = get_loc_matrix(obj.location)
+        self.__bound_box__ = [lm.inverted() @ Vector(v) for v in get_count_bound_box(obj)]
 
     @property
     def name(self):
@@ -82,7 +83,7 @@ class MeasureObjects:
 
         for m in self.__measures__:
             self.__points__.extend([m.min, m.max])
-            
+
     def __iter__(self):
         return iter(self.__measures__)
 

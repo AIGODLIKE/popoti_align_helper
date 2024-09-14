@@ -10,9 +10,6 @@ from ...utils import bound_to_tuple, vertices_co
 class ToGround:
     def align_to_ground(self, context):
         dep = context.evaluated_depsgraph_get()
-        # a = get_count_bound_box(context.active_object)
-        # print(a)
-        # return
         if self.ground_plane_mode == "RAY_CASTING":
             self.align_to_ground_ray_casting(context, dep)
         else:
@@ -62,7 +59,7 @@ class ToGround:
         for obj in context.selected_objects:
             context.view_layer.update()
             if self.ground_ray_casting_rotation:
-                self.ray_casting_rotation(context, obj, dep, level=0)
+                self.ray_casting_rotation(context, obj, dep)
             else:
                 point = _get_bound_box_center_point_(get_count_bound_box(obj))
                 result, location, normal, index, o, matrix = context.scene.ray_cast(
@@ -98,7 +95,7 @@ class ToGround:
             context.view_layer.update()
 
     @staticmethod
-    def ray_casting_rotation(context, obj, dep, level=0):
+    def ray_casting_rotation(context, obj, dep):
         """使用光线投射旋转
         使用法向来确认旋转
         两次投射确认旋转没问题
