@@ -48,5 +48,6 @@
   "Ground Plane Mode": "地面平面模式",
   "Fall": "坠落",
   "Ray Casting Rotation": "光线投射旋转",
-  "Align Objects\nCtrl    Align Rotation\nShift  Align Zoom\nAlt     Align Position\nCombined presses": "对齐物体\nCtrl    对齐旋转\nShift   对齐缩放\nAlt     对齐位置\n可组合按"
+  "Align Objects\nCtrl    Align Rotation\nShift  Align Zoom\nAlt     Align Position\nCombined presses": "对齐物体\nCtrl    对齐旋转\nShift   对齐缩放\nAlt     对齐位置\n可组合按",
+  "Please select at least one object": "请至少选择一个物体"
 }

@@ -171,13 +171,15 @@ class ObjectAlignPanel(Panel):
 
     def draw(self, context):
         col = self.layout.column(align=True)
-        row = col.row(align=True)
         if getattr(context.space_data, 'region_3d', False):
             from ..ops import ObjectAlignByView
             from ..utils import get_pref
+            row = col.row(align=True)
             ObjectAlignByView.draw_nine_square_box(row, show_text=False, ops=None)
             draw_right(row, context)
             draw_fall(col)
+            if context.selected_objects.__len__() == 0:
+                col.label(text="Please select at least one object")
 
 
 class_tuples = (
