@@ -103,12 +103,6 @@ class AlignObject(
     ToAlign,
     UI
 ):
-    """Align Objects
-Ctrl    Align Rotation
-Shift  Align Zoom
-Alt     Align Position
-Combined presses"""
-
     bl_idname = 'object.tool_kits_fast_align'
     bl_label = 'POPOTI Align Helper'
     bl_options = {'REGISTER', 'UNDO'}
@@ -130,6 +124,7 @@ Combined presses"""
             self.align_rotation = event.ctrl
             self.align_scale = event.shift
             self.align_location = event.alt
+            self.align_location_axis = self.align_rotation_axis = self.align_scale_axis = {"X", "Y", "Z"}
         return self.execute(context)
 
     def execute(self, context):
