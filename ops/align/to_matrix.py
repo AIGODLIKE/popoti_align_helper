@@ -92,5 +92,4 @@ def to_matrix(
     """
     for obj in objects:
         mat = get_matrix(ops, obj.matrix_world, to)
-        print(obj.name, mat)
         obj.matrix_world = mat

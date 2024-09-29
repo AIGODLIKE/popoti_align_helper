@@ -12,7 +12,6 @@ def __get_v__(self, key, default):
 def __set_v__(self, key, value):
     k = f"{self.align_mode}_{key}"
     self[k] = value
-    print(k, value)
 
 
 ENUM_DISTRIBUTION_SORTED_AXIS = [
