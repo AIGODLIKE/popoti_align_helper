@@ -12,6 +12,7 @@ def __get_v__(self, key, default):
 def __set_v__(self, key, value):
     k = f"{self.align_mode}_{key}"
     self[k] = value
+    print(k, value)
 
 
 ENUM_DISTRIBUTION_SORTED_AXIS = [
@@ -97,9 +98,11 @@ class OperatorProperty:
 
     def __get_lx__(self):
         key = f"{self.align_mode}_align_location_axis"
-        if self.align_mode == "GROUND" and key not in self:
-            # 地面默认只开Z
-            return 4
+        if key not in self:
+            if self.align_mode == "GROUND":
+                # 地面默认只开Z
+                return 4
+            return default_xyz_enum
         return __get_v__(self, "align_location_axis", default=default_xyz_enum)
 
     align_location_axis: EnumProperty(
@@ -108,13 +111,13 @@ class OperatorProperty:
         **axis_enum_property
     )
     align_rotation_axis: EnumProperty(
-        # get=lambda self: __get_v__(self, "Rotation Euler Axis", default=default_xyz_enum),
-        # set=lambda self, value: __set_v__(self, "Rotation Euler Axis", value),
+        get=lambda self: __get_v__(self, "rotation_euler_axis", default=default_xyz_enum),
+        set=lambda self, value: __set_v__(self, "rotation_euler_axis", value),
         **axis_enum_property
     )
     align_scale_axis: EnumProperty(
-        # get=lambda self: __get_v__(self, "Scale Axis", default=default_xyz_enum),
-        # set=lambda self, value: __set_v__(self, "Scale Axis", value),
+        get=lambda self: __get_v__(self, "scale_axis", default=default_xyz_enum),
+        set=lambda self, value: __set_v__(self, "scale_axis", value),
         **axis_enum_property
     )
 
