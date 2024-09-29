@@ -1,11 +1,15 @@
 import bpy
 from bpy.types import Menu
 
-from .ops import ObjectAlignByView as view
-from .panel import (draw_ground,
-                    draw_distribution_y, draw_distribution_x,
-                    draw_center_align, draw_fall)
-from .utils import screen_relevant_direction_3d_axis
+from ..ops import ObjectAlignByView as view
+from .panel import (
+    draw_ground,
+    draw_distribution_y,
+    draw_distribution_x,
+    draw_center_align,
+    draw_fall
+)
+from ..utils import screen_relevant_direction_3d_axis
 
 
 class AlignPieMenu(Menu):

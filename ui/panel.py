@@ -1,9 +1,9 @@
 import bpy
 from bpy.types import Panel
 
-from .icons import get_icon
-from .ops import AlignObject
-from .utils import screen_relevant_direction_3d_axis
+from ..ops import AlignObject
+from ..res.icons import get_icon
+from ..utils import screen_relevant_direction_3d_axis
 
 AXIS = ('X', 'Y', 'Z')
 
@@ -33,7 +33,7 @@ def set_axis(layout, axis, icon, center=False):
 
 
 def set_text(text: str):
-    from .utils import get_pref
+    from ..utils import get_pref
     pref = get_pref()
     if pref.show_text:
         return text
@@ -162,18 +162,19 @@ class ObjectAlignPanel(Panel):
 
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = "Tool"
+    bl_category = 'Tool'
+    bl_options = set()
 
     @classmethod
     def poll(cls, context):
-        return context.mode == "OBJECT"
+        return context.mode == 'OBJECT'
 
     def draw(self, context):
         col = self.layout.column(align=True)
         row = col.row(align=True)
         if getattr(context.space_data, 'region_3d', False):
-            from .ops import ObjectAlignByView
-            from .utils import get_pref
+            from ..ops import ObjectAlignByView
+            from ..utils import get_pref
             ObjectAlignByView.draw_nine_square_box(row, show_text=False, ops=None)
             draw_right(row, context)
             draw_fall(col)

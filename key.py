@@ -1,6 +1,6 @@
 import bpy
 
-from .pie import AlignPieMenu
+from .ui.pie import AlignPieMenu
 
 kmi = None
 

@@ -58,7 +58,7 @@ class ObjectAlignByView(Operator):
 
     @staticmethod
     def _item_(layout: bpy.types.Operator, identifier, show_text, ops):
-        from ..icons import get_icon
+        from ..res.icons import get_icon
         text = identifier.replace('Align_', '').replace('_', ' ') if show_text else ''
         if ops:
             layout.context_pointer_set('ops', ops)
@@ -90,9 +90,7 @@ class ObjectAlignByView(Operator):
             'Align_Center': {'X', 'Y', 'Z'}
         }
         axis = axis_items[self.align_mode]
-        args = dict(
-            align_mode='ALIGN',
-        )
+        args = dict(align_mode='ALIGN')
 
         for i in axis:
             value = 'MIN' if len(i) >= 2 else 'MAX'

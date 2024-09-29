@@ -73,7 +73,6 @@ class UI:
         col.prop(self, 'ground_plane_mode', expand=True)
         col.separator(factor=2)
 
-
     def draw_align(self, layout: bpy.types.UILayout):
         col = layout.column()
 
@@ -104,13 +103,11 @@ class AlignObject(
     ToAlign,
     UI
 ):
-    """
-    对齐物体
-    # Ctrl    对齐旋转
-    # Shift   对齐缩放
-    # Alt     对齐位置
-    可组合按
-    """
+    """Align Objects
+Ctrl    Align Rotation
+Shift  Align Zoom
+Alt     Align Position
+Combined presses"""
 
     bl_idname = 'object.tool_kits_fast_align'
     bl_label = 'POPOTI Align Helper'
@@ -120,7 +117,6 @@ class AlignObject(
     def poll(cls, context):
         return context.selected_objects.__len__()
 
-
     def draw(self, context):
         layout = self.layout
         col = layout.column()
@@ -129,14 +125,11 @@ class AlignObject(
             run_func(col)
         col.column().prop(self, 'align_mode', expand=True)
 
-
     def invoke(self, context, event):
-        if event.ctrl:
-            self.align_rotation = True
-        if event.shift:
-            self.align_scale = True
-        if event.alt:
-            self.align_location = True
+        if event.ctrl or event.shift or event.alt:
+            self.align_rotation = event.ctrl
+            self.align_scale = event.shift
+            self.align_location = event.alt
         return self.execute(context)
 
     def execute(self, context):
