@@ -4,7 +4,12 @@ More friendly alignment based on observation perspective<br>
 ![Video](res/readme/video.gif)
 ![Preview](res/readme/preview.png)
 
-- Ctrl Alt A Align Pie Menu
+Align Objects Combined presses
+- Ctrl    Align Rotation<br>
+-  Shift  Align Zoom<br>
+-  Alt     Align Position<br>
+
+Ctrl Alt A Align Pie Menu
 
 <img alt="img.png" height="256" src="res/readme/pie_menu_align.png" />
 
