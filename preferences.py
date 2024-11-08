@@ -68,8 +68,7 @@ class AddonProperty(AddonPreferences):
         from rna_keymap_ui import draw_kmi
         from .key import keymaps
 
-        kc = bpy.context.window_manager.keyconfigs.user  # 获取按键配置addon的
-
+        kc = bpy.context.window_manager.keyconfigs.user
         for km, kmi in keymaps:
             km = kc.keymaps.get(km.name)
             if km:
