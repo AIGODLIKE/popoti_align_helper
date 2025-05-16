@@ -1,13 +1,10 @@
-import json
-import os
+import ast
 import re
 
 import bpy
 
-from .helper import TranslationHelper
+from . import zh_CN
 
-dir_name = os.path.dirname(__file__)
-help_classes = []
 
 def get_language_list() -> list:
     """
@@ -19,33 +16,45 @@ TypeError: bpy_struct: item.attr = val: enum "a" not found in ('DEFAULT', 'en_US
         bpy.context.preferences.view.language = ""
     except TypeError as e:
         matches = re.findall(r'\(([^()]*)\)', e.args[-1])
-        text = f"({matches[-1]})"
-        return eval(text)
+        return ast.literal_eval(f"({matches[-1]})")
 
 
-all_language = get_language_list()
-language = bpy.context.preferences.view.language
-if language not in all_language:
-    if language == "zh_CN":
-        language = "zh_HANS"
-    elif language == "zh_HANS":
-        language = "zh_CN"
+class TranslationHelper:
+    def __init__(self, name: str, data: dict, lang='zh_CN'):
+        self.name = name
+        self.translations_dict = dict()
 
-for file in os.listdir(dir_name):
-    if not file.endswith('.json'):
-        continue
-    with open(os.path.join(dir_name, file), 'r', encoding='utf-8') as f:
-        d = json.load(f)
-        help_cls = TranslationHelper('popoti_align_helper_' + file, d, lang=language)
-        help_classes.append(help_cls)
-        zh_cn = d
+        for src, src_trans in data.items():
+            key = ("Operator", src)
+            self.translations_dict.setdefault(lang, {})[key] = src_trans
+            key = ("*", src)
+            self.translations_dict.setdefault(lang, {})[key] = src_trans
+
+    def register(self):
+        bpy.app.translations.register(self.name, self.translations_dict)
+
+    def unregister(self):
+        bpy.app.translations.unregister(self.name)
+
+
+translate = None
 
 
 def register():
-    for cls in help_classes:
-        cls.register()
+    global translate
+
+    language = "zh_CN"
+    all_language = get_language_list()
+    if language not in all_language:
+        if language == "zh_CN":
+            language = "zh_HANS"
+        elif language == "zh_HANS":
+            language = "zh_CN"
+    translate = TranslationHelper(f"popoti_align_helper_{language}", zh_CN.data, lang=language)
+    translate.register()
 
 
 def unregister():
-    for cls in help_classes:
-        cls.unregister()
+    global translate
+    translate.unregister()
+    translate = None

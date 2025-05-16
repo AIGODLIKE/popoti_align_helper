@@ -1,4 +1,4 @@
-{
+data = {
   "3D View: POPOTI Align Helper": "3D 视图: POPOTI对齐助手",
   "POPOTI Align Helper": "POPOTI对齐助手",
   "World Original": "世界原点",
