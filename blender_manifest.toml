@@ -7,5 +7,5 @@ maintainer = "AIGODLIKE Community(小萌新)"
 name = "POPOTI Align Helper"
 tagline = "More friendly alignment based on observation perspective"
 type = "add-on"
-version = "1.2.4"
+version = "1.2.5"
 tags = ["3D View", "Object"]
