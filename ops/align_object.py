@@ -7,6 +7,7 @@ from .align.to_align import ToAlign
 from .align.to_distribution import ToDistribution
 from .align.to_ground import ToGround
 from .align.to_matrix import get_matrix
+from ..utils import translate_lines_text
 
 
 class UI:
@@ -106,6 +107,64 @@ class AlignObject(
     bl_idname = 'object.tool_kits_fast_align'
     bl_label = 'POPOTI Align Helper'
     bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def description(cls, context, properties):
+        mode = properties.align_mode
+        axis = "  ".join([f'{a.upper()}:{getattr(properties, f"align_{a.lower()}_method")}' for a in
+                          properties.align_location_axis]) if properties.align_location else []
+
+        key_tips = [
+            "",
+            "Ctrl: only location",
+            "Shift: only rotation",
+        ]
+
+        if mode == "ORIGINAL":
+            return translate_lines_text("Alignment to the origin (world axis)", *key_tips)
+        elif mode == "ACTIVE":
+            return translate_lines_text(
+                "Aligns the selected object to the active item",
+                "if there is no active item, it will be aligned to the first item in the selected list",
+                *key_tips
+            )
+        elif mode == "CURSOR":
+            return translate_lines_text("Align selected objects to the cursor", *key_tips)
+        elif mode == "ALIGN":
+            return translate_lines_text("Calculate the bounding box of all selected objects",
+                                        "aligning them according to the selected axes and the alignment of each axis",
+                                        axis,
+                                        *key_tips,
+                                        )
+        elif mode == "GROUND":
+            plane = properties.ground_plane_mode
+            if plane == "GROUND":
+                return translate_lines_text("Align to the ground (world Z-axis 0)", *key_tips)
+            elif plane == "RAY_CASTING":
+                return translate_lines_text(
+                    "Project the light down through the center of the object's bounding box",
+                    "and if it can be projected onto the object, align the object to the projection point",
+                    *key_tips
+                )
+            # elif plane == "DESIGNATED_OBJECT": #这个选项应该不会用到
+        elif mode == "DISTRIBUTION":
+            distribution_mode = properties.distribution_mode
+            if distribution_mode == "FIXED":
+                return translate_lines_text(
+                    "Distributed alignment, where a large bounding box is calculated for all objects",
+                    "and within the bounding box, "
+                    "objects are aligned according to the total length of all "
+                    "objects so that each object is equally spaced",
+                    *key_tips
+                )
+            elif distribution_mode == "ADJUSTMENT":
+                return translate_lines_text(
+                    "Distributed alignment, where the smallest object is fixed at the coordinates",
+                    "and the position of each object is arranged "
+                    "at a set spacing so that each object is equally spaced",
+                    *key_tips
+                )
+        return "Align Object"
 
     @classmethod
     def poll(cls, context):

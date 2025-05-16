@@ -2,7 +2,7 @@ import bpy
 from bpy.props import EnumProperty
 from bpy.types import Operator
 
-from ..utils import screen_relevant_direction_3d_axis
+from ..utils import screen_relevant_direction_3d_axis, translate_lines_text
 
 
 class ObjectAlignByView(Operator):
@@ -24,6 +24,12 @@ class ObjectAlignByView(Operator):
             ("Align_Right_Down", "Right Down", ""),
         ]
     )
+
+    @classmethod
+    def description(cls, context, properties):
+        for i in properties.bl_rna.properties['align_mode'].enum_items:
+            if i.identifier == properties.align_mode:
+                return translate_lines_text(i.name)
 
     @classmethod
     def poll(cls, context):

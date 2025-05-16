@@ -1,14 +1,13 @@
 from time import time
 
 import bpy
-import numpy as _np
 import numpy as np
 from mathutils import Vector
 
 
 def np_matrix_dot(np_co, matrix):
-    np_co = _np.insert(np_co, 3, 1, axis=1).T  # 对numpy数据插入一位数并进行转置
-    np_co[:] = _np.dot(matrix, np_co)  # 点乘得到变换后的点位置
+    np_co = np.insert(np_co, 3, 1, axis=1).T  # 对numpy数据插入一位数并进行转置
+    np_co[:] = np.dot(matrix, np_co)  # 点乘得到变换后的点位置
     np_co /= np_co[3, :]  # 除一下第四位
     np_co = np_co.T  # 再转置一下
     np_co = np_co[:, :3]  # 取前三位坐标数据
@@ -46,7 +45,7 @@ def vertices_co(data, *, matrix=None, debug=False):
         data = _get_mesh(data)
         vertices = data.vertices
         v_l = vertices.__len__()
-        np_co = _np.zeros(v_l * 3, dtype=_np.float32)
+        np_co = np.zeros(v_l * 3, dtype=np.float32)
 
         vertices.foreach_get('co', np_co)
     except Exception as e:
@@ -135,3 +134,8 @@ def screen_relevant_direction_3d_axis(context, *, return_type=None):
 def get_pref():
     """获取偏好"""
     return bpy.context.preferences.addons[__package__].preferences
+
+
+def translate_lines_text(*args, split="\n"):
+    from bpy.app.translations import pgettext_iface
+    return split.join([pgettext_iface(line) for line in args])
