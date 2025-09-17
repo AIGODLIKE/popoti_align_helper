@@ -4,7 +4,7 @@ bl_info = {
     "name": "POPOTI Align Helper",
     "description": "More friendly alignment based on observation perspective",
     "author": "AIGODLIKE Community(小萌新)",
-    "version": (1, 2, 5),
+    "version": (1, 2, 6),
     "blender": (3, 0, 0),
     "location": "Tool Panel",
     "support": "COMMUNITY",
