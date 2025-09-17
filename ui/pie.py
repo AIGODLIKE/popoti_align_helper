@@ -9,7 +9,7 @@ from .panel import (
     draw_center_align,
     draw_fall
 )
-from ..utils import screen_relevant_direction_3d_axis
+from ..utils.view import screen_relevant_direction_3d_axis
 
 
 class AlignPieMenu(Menu):

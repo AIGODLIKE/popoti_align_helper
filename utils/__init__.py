@@ -73,67 +73,10 @@ def bound_to_tuple(obj, matrix=None) -> tuple:
     else:
         return tuple(i[:] for i in obj.bound_box)
 
-
-def screen_relevant_direction_3d_axis(context, *, return_type=None):
-    """获取基于视图的3D空间3D轴的相对视图XY轴对应轴
-    Args:
-        context (_type_): _description_
-        return_type (_type_, optional): _description_. Defaults to None.
-
-    Returns:
-        tuple(x轴,y轴): 轴分别有一个正向和负向
-    """
-    from math import pi
-    from mathutils import Vector
-    from bpy_extras.view3d_utils import location_3d_to_region_2d
-    area = context.area
-    region_3d = context.space_data.region_3d
-    origin = location_3d_to_region_2d(area, region_3d, Vector())  # 原点
-
-    ox = Vector((1, 0))
-    oy = Vector((0, 1))
-    data = {'x': {'angle': 360},
-            'y': {'angle': 360},
-            }
-
-    for index, axis in enumerate(('X', 'Y', 'Z')):
-        # 循环测试这三个轴
-        av = Vector()
-        av[index] = 1
-        loc2d = location_3d_to_region_2d(area, region_3d, av)  # 获取轴在屏幕上的点
-        if not loc2d or not origin:
-            return ("X", "-X"), ("Y", "-Y")
-
-        v_2d = loc2d - origin
-
-        if v_2d == Vector((0, 0)):
-            # print(axis, '轴平行于视图', v_2d, '== Vector((0, 0))', loc2d, '\n')
-            continue
-
-        def get_and_set_axis(o: Vector, screen_axis, axis_):
-            """判断此轴与屏幕空间的轴的角度是不是最小并设置"""
-            angle = (180 * o.angle(v_2d)) / pi
-            angle_ = 180 - angle
-
-            i_ = '-' + axis_
-            if angle <= data[screen_axis]['angle']:
-                data[screen_axis]['angle'] = angle
-                data[screen_axis]['axis'] = (axis_, i_)
-            if angle_ <= data[screen_axis]['angle']:
-                data[screen_axis]['angle'] = angle_
-                data[screen_axis]['axis'] = (i_, axis_)
-
-        get_and_set_axis(ox, 'x', axis)
-        get_and_set_axis(oy, 'y', axis)
-    if return_type:
-        return data
-
-    return data['x']['axis'], data['y']['axis']
-
-
 def get_pref():
     """获取偏好"""
-    return bpy.context.preferences.addons[__package__].preferences
+    from .. import __package__ as base_package
+    return bpy.context.preferences.addons[base_package].preferences
 
 
 def translate_lines_text(*args, split="\n"):

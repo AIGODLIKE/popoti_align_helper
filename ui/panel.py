@@ -3,7 +3,7 @@ from bpy.types import Panel
 
 from ..ops import AlignObject
 from ..res.icons import get_icon
-from ..utils import screen_relevant_direction_3d_axis
+from ..utils.view import screen_relevant_direction_3d_axis
 
 AXIS = ('X', 'Y', 'Z')
 

@@ -2,7 +2,8 @@ import bpy
 from bpy.props import EnumProperty
 from bpy.types import Operator
 
-from ..utils import screen_relevant_direction_3d_axis, translate_lines_text
+from ..utils import translate_lines_text
+from ..utils.view import screen_relevant_direction_3d_axis
 
 
 class ObjectAlignByView(Operator):
