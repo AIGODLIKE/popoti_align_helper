@@ -18,7 +18,7 @@ class ToAlign:
             bp = m.min_bound_box_point
             to = to_loc - self.__mix_loc__([bp, Vector(), bp * -1])
 
-            loc = get_loc_matrix(self.__get_distribution_loc__(to, obj.location))
+            loc = get_loc_matrix(self.__mix_two_loc__(to, obj.location))
 
             context.view_layer.update()
             context.scene.objects[m.name].matrix_world = loc @ rot @ sca

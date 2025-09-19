@@ -105,8 +105,8 @@ class OperatorProperty:
         return __get_v__(self, "align_location_axis", default=default_xyz_enum)
 
     align_location_axis: EnumProperty(
-        get=__get_lx__,
-        set=lambda self, value: __set_v__(self, "align_location_axis", value),
+        # get=__get_lx__,
+        # set=lambda self, value: __set_v__(self, "align_location_axis", value),
         **axis_enum_property
     )
     align_rotation_axis: EnumProperty(
